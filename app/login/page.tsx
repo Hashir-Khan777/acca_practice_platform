@@ -34,14 +34,6 @@ export default function LoginPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        localStorage.setItem('acca_access_token', result.data.token);
-        
-        const store = loadStore();
-        const updatedStore = {
-          ...store,
-          currentUser: result.data.user
-        };
-        saveStore(updatedStore);
         setIsSubmitting(false);
 
         if (result.data.user.role === 'admin') {
@@ -51,63 +43,14 @@ export default function LoginPage() {
         }
         return;
       } else {
-        // If the backend specifically rejected the credentials, show the error immediately
-        if (res.status === 400 || res.status === 403) {
-          setError(result.message || 'Invalid credentials.');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("Backend API not reachable. Falling back to client-side simulator.");
-    }
-
-    // Client-side simulation fallback
-    setTimeout(() => {
-      const store = loadStore();
-      const matched = store.users.find((u: any) => u.email.toLowerCase() === email.toLowerCase());
-
-      if (!matched) {
-        setError('No account found with this email.');
+        setError(result.message || 'Invalid credentials.');
         setIsSubmitting(false);
         return;
       }
-
-      if (matched.status === 'suspended') {
-        setError('This account has been suspended by the administrator.');
-        setIsSubmitting(false);
-        return;
-      }
-
-      const nowStr = new Date().toISOString();
-      const updatedUser = { ...matched, lastLogin: nowStr };
-      const updatedUsers = store.users.map((u: any) => u.id === matched.id ? updatedUser : u);
-      const updatedLogs = [
-        { id: 'log-' + Date.now(), user: matched.email, action: 'LOGIN', details: `User logged in with role: ${matched.role}`, timestamp: nowStr },
-        ...store.auditLogs
-      ];
-
-      const updatedStore = {
-        ...store,
-        currentUser: updatedUser,
-        users: updatedUsers,
-        auditLogs: updatedLogs
-      };
-
-      saveStore(updatedStore);
+    } catch (err: any) {
+      setError(err.message || 'Internal connection error. Database is not reachable.');
       setIsSubmitting(false);
-
-      if (matched.role === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-    }, 800);
-  };
-
-  const loginAs = (role: 'student' | 'admin') => {
-    setEmail(role === 'student' ? 'hashirkhanacca2025@gmail.com' : 'admin@accapractice.ai');
-    setPassword('demopass123');
+    }
   };
 
   return (

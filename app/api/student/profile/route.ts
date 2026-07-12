@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { User, AuditLog } from '@/lib/models';
-import { verifyAccessToken } from '@/lib/jwt';
+import { getAuthUser } from '@/lib/jwt';
 
 export async function PUT(req: NextRequest) {
   try {
     await connectDB();
     
     // Auth Check
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
     const { name, email, country, accaLevel } = await req.json();
@@ -23,8 +18,6 @@ export async function PUT(req: NextRequest) {
     if (!name || !email) {
       return NextResponse.json({ success: false, message: 'Name and email are required fields.', data: {}, errors: ['Missing fields'] }, { status: 400 });
     }
-
-    const user = await User.findById(decoded.id);
     if (!user) {
       return NextResponse.json({ success: false, message: 'Account not found.', data: {}, errors: ['Not found'] }, { status: 404 });
     }

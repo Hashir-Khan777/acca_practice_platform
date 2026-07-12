@@ -1,40 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { User } from '@/lib/models';
-import { verifyAccessToken } from '@/lib/jwt';
+import { getAuthUser } from '@/lib/jwt';
 
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({
-        success: false,
-        message: 'No authorization header provided.',
-        data: {},
-        errors: ['Unauthorized access']
-      }, { status: 401 });
-    }
+    const user = await getAuthUser(req);
 
-    const token = authHeader.split(' ')[1];
-    const payload = verifyAccessToken(token);
-
-    if (!payload) {
+    if (!user) {
       return NextResponse.json({
         success: false,
         message: 'Access token is invalid or has expired.',
         data: {},
-        errors: ['Token expired']
-      }, { status: 401 });
-    }
-
-    const user = await User.findById(payload.id);
-    if (!user) {
-      return NextResponse.json({
-        success: false,
-        message: 'User account no longer exists.',
-        data: {},
-        errors: ['User not found']
+        errors: ['Unauthorized access']
       }, { status: 401 });
     }
 

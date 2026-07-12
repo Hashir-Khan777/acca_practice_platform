@@ -23,15 +23,37 @@ export default function PageWrapper({
   const [emailError, setEmailError] = React.useState('');
 
   React.useEffect(() => {
-    const data = loadStore();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setStore(data);
-    // Apply initial theme
-    if (data.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    async function checkSession() {
+      const initialTheme = typeof window !== 'undefined' ? (localStorage.getItem('acca_theme') || 'light') : 'light';
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            setStore({
+              currentUser: json.data.user,
+              theme: initialTheme
+            });
+            if (initialTheme === 'dark') {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            return;
+          }
+        }
+      } catch (e) {}
+      setStore({
+        currentUser: null,
+        theme: initialTheme
+      });
+      if (initialTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
+    checkSession();
   }, []);
 
   if (!store) {
@@ -57,10 +79,11 @@ export default function PageWrapper({
     }
   };
 
-  const handleLogout = () => {
-    const updated = { ...store, currentUser: null };
-    setStore(updated);
-    saveStore(updated);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
+    setStore({ ...store, currentUser: null });
     router.push('/login');
   };
 

@@ -9,7 +9,15 @@ export async function POST(req: NextRequest) {
       errors: []
     });
 
-    // Clear HttpOnly refresh token cookie by setting maxAge to 0
+    // Clear HttpOnly secure cookies for access and refresh tokens
+    response.cookies.set('acca_access_token', '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 0,
+      path: '/'
+    });
+
     response.cookies.set('acca_refresh_token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

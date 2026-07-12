@@ -8,7 +8,7 @@ import { Button, Card, Badge, Input, Select, Progress, Dialog } from '@/componen
 import {
   BookOpen, Clock, Sparkles, Bookmark, ChevronRight, Check, AlertTriangle, CheckCircle, ArrowRight
 } from 'lucide-react';
-import { updateStreakOnPractice, MOCK_AI_QUESTIONS, Quiz, Attempt, Question } from '@/lib/store';
+import { updateStreakOnPractice, Quiz, Attempt, Question } from '@/lib/store';
 
 export default function StudentPracticeQuizPage() {
   const router = useRouter();
@@ -652,10 +652,8 @@ export default function StudentPracticeQuizPage() {
 
           <div className="flex flex-col gap-4 text-left mt-2">
             <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-extrabold">Detailed Question-By-Question Analysis</span>
-            
             {(() => {
-              const subjectKey = latestAttempt.subject.toLowerCase().includes("audit") ? "sub-aa" : "sub-fr";
-              const fallbackQs = MOCK_AI_QUESTIONS[subjectKey] || MOCK_AI_QUESTIONS['sub-fr'];
+              const fallbackQs = latestAttempt.questions || [];
               
               return fallbackQs.map((q: Question, idx: number) => {
                 const userAns = latestAttempt.answers[q.id] || [];

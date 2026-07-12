@@ -19,20 +19,85 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [error, setError] = React.useState('');
 
   React.useEffect(() => {
-    const data = loadStore();
-    // Validate that user is admin
-    if (!data.currentUser || data.currentUser.role !== 'admin') {
-      router.push('/login');
-      return;
-    }
-    setStore(data);
+    async function initAdmin() {
+      try {
+        // 1. Fetch current admin user profile
+        const userRes = await fetch('/api/auth/me');
+        if (!userRes.ok) {
+          router.push('/login');
+          return;
+        }
+        const userJson = await userRes.json();
+        if (!userJson.success || userJson.data.user.role !== 'admin') {
+          router.push('/login');
+          return;
+        }
 
-    // Apply theme
-    if (data.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+        const currentUser = userJson.data.user;
+        const initialTheme = typeof window !== 'undefined' ? (localStorage.getItem('acca_theme') || 'light') : 'light';
+
+        // 2. Fetch student accounts
+        const studentsRes = await fetch('/api/admin/students');
+        const studentsJson = await studentsRes.json();
+        const users = studentsJson.success ? studentsJson.data.students : [];
+
+        // 3. Fetch admin tickets
+        const ticketsRes = await fetch('/api/admin/tickets');
+        const ticketsJson = await ticketsRes.json();
+        const tickets = ticketsJson.success ? ticketsJson.data.tickets : [];
+
+        // 4. Fetch announcements
+        const annRes = await fetch('/api/admin/announcements');
+        const annJson = await annRes.json();
+        const announcements = annJson.success ? annJson.data.announcements : [];
+
+        // 5. Fetch inbox messages
+        const msgRes = await fetch('/api/admin/inbox');
+        const msgJson = await msgRes.json();
+        const contactMessages = msgJson.success ? msgJson.data.messages : [];
+
+        // 6. Fetch audit logs
+        const logsRes = await fetch('/api/admin/logs');
+        const logsJson = await logsRes.json();
+        const auditLogs = logsJson.success ? logsJson.data.logs : [];
+
+        // 7. Fetch syllabus
+        const sylRes = await fetch('/api/admin/syllabus');
+        const sylJson = await sylRes.json();
+        const subjects = sylJson.success ? sylJson.data.subjects : [];
+        const topics = sylJson.success ? sylJson.data.topics : [];
+
+        // Fetch attempts for admin performance analytics widgets
+        const attemptsRes = await fetch('/api/student/attempts');
+        const attemptsJson = await attemptsRes.json();
+        const attempts = attemptsJson.success ? attemptsJson.data.attempts : [];
+
+        setStore({
+          currentUser,
+          users: [currentUser, ...users],
+          tickets,
+          announcements,
+          contactMessages,
+          auditLogs,
+          subjects,
+          topics,
+          attempts,
+          theme: initialTheme
+        });
+
+        // Apply theme
+        if (initialTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+
+      } catch (err) {
+        console.error('Failed to initialize admin dashboard portal:', err);
+        router.push('/login');
+      }
     }
+    initAdmin();
   }, [router]);
 
   if (!store) {
@@ -62,9 +127,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  const handleLogout = () => {
-    const updated = { ...store, currentUser: null };
-    saveStore(updated);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
     router.push('/login');
   };
 

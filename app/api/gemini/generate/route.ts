@@ -2,22 +2,17 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Quiz, AuditLog } from "@/lib/models";
-import { MOCK_AI_QUESTIONS } from "@/lib/store";
-import { verifyAccessToken } from "@/lib/jwt";
+import { getAuthUser } from "@/lib/jwt";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
     // Check user auth token
-    const authHeader = req.headers.get('authorization');
+    const user = await getAuthUser(req);
     let userEmail = 'anonymous@acca.ai';
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      const decoded = verifyAccessToken(token);
-      if (decoded) {
-        userEmail = decoded.email;
-      }
+    if (user) {
+      userEmail = user.email;
     }
 
     const { subject, topic, difficulty, numQuestions, questionType } = await req.json();
@@ -25,34 +20,12 @@ export async function POST(req: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
-      console.warn("GEMINI_API_KEY is not configured. Falling back to realistic pre-loaded questions.");
-      
-      const subKey = subject?.toLowerCase().includes("audit") ? "sub-aa" : "sub-fr";
-      const mockQuestions = MOCK_AI_QUESTIONS[subKey] || MOCK_AI_QUESTIONS['sub-fr'];
-      const sliced = mockQuestions.slice(0, numQuestions || 3);
-
-      // Save fallback quiz to MongoDB for referencing quiz attempts
-      const newQuiz = new Quiz({
-        title: `${subject} - ${topic} Practice Exam (Offline Mode)`,
-        subject,
-        topic,
-        difficulty,
-        type: questionType || 'MCQ',
-        questions: sliced,
-        generatedBy: 'AI'
-      });
-      await newQuiz.save();
-
       return NextResponse.json({
-        success: true,
-        message: "Generated using realistic ACCA Syllabus offline fallback (Set GEMINI_API_KEY in Settings > Secrets to unlock live AI generator).",
-        data: {
-          quizId: newQuiz._id.toString(),
-          questions: sliced,
-          isFallback: true
-        },
-        errors: []
-      });
+        success: false,
+        message: "Gemini API Key is not configured. Please set the GEMINI_API_KEY secret under Admin Settings > Secrets to generate practice questions.",
+        data: {},
+        errors: ["API Key missing"]
+      }, { status: 400 });
     }
 
     // Initialize the Gemini SDK

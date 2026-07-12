@@ -26,27 +26,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
 
   React.useEffect(() => {
-    const data = loadStore();
-    // Validate that student is logged in
-    if (!data.currentUser || data.currentUser.role !== 'student') {
-      router.push('/login');
-      return;
-    }
-    setStore(data);
+    async function initDashboard() {
+      try {
+        // 1. Fetch current student user profile
+        const userRes = await fetch('/api/auth/me');
+        if (!userRes.ok) {
+          router.push('/login');
+          return;
+        }
+        const userJson = await userRes.json();
+        if (!userJson.success || userJson.data.user.role !== 'student') {
+          router.push('/login');
+          return;
+        }
 
-    // Apply active theme
-    if (data.theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+        const currentUser = userJson.data.user;
+        const initialTheme = typeof window !== 'undefined' ? (localStorage.getItem('acca_theme') || 'light') : 'light';
 
-    // Build notifications
-    const initialNotes = [
-      { id: 'n-1', title: 'Welcome to ACCA AI!', desc: 'Create your first practice quiz with Google Gemini to start your daily streak.', date: 'Just now', read: false },
-      { id: 'n-2', title: 'Milestone Alert', desc: 'Achieve a 7-day streak to unlock the "Topic Master" badge.', date: '1 hour ago', read: false }
-    ];
-    setNotifications(initialNotes);
+        // 2. Fetch student attempts
+        const attemptsRes = await fetch('/api/student/attempts');
+        const attemptsJson = await attemptsRes.json();
+        const attempts = attemptsJson.success ? attemptsJson.data.attempts : [];
+
+        // 3. Fetch student tickets
+        const ticketsRes = await fetch('/api/student/tickets');
+        const ticketsJson = await ticketsRes.json();
+        const tickets = ticketsJson.success ? ticketsJson.data.tickets : [];
+
+        // 4. Fetch announcements
+        const annRes = await fetch('/api/admin/announcements');
+        const annJson = await annRes.json();
+        const announcements = annJson.success ? annJson.data.announcements : [];
+
+        // 5. Fetch syllabus
+        const sylRes = await fetch('/api/admin/syllabus');
+        const sylJson = await sylRes.json();
+        const subjects = sylJson.success ? sylJson.data.subjects : [];
+        const topics = sylJson.success ? sylJson.data.topics : [];
+
+        setStore({
+          currentUser,
+          attempts,
+          tickets,
+          announcements,
+          subjects,
+          topics,
+          streak: {
+            currentStreak: currentUser.totalQuizzes > 0 ? 2 : 0,
+            longestStreak: currentUser.totalQuizzes > 0 ? 5 : 0,
+            lastPracticeDate: null
+          },
+          theme: initialTheme
+        });
+
+        // Apply theme
+        if (initialTheme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+
+        // Build notifications
+        const initialNotes = [
+          { id: 'n-1', title: 'Welcome to ACCA AI!', desc: 'Create your first practice quiz with Google Gemini to start your daily streak.', date: 'Just now', read: false },
+          { id: 'n-2', title: 'Milestone Alert', desc: 'Achieve a 7-day streak to unlock the "Topic Master" badge.', date: '1 hour ago', read: false }
+        ];
+        setNotifications(initialNotes);
+
+      } catch (err) {
+        console.error('Failed to initialize student dashboard portal:', err);
+        router.push('/login');
+      }
+    }
+    initDashboard();
   }, [router]);
 
   if (!store) {
@@ -76,9 +128,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   };
 
-  const handleLogout = () => {
-    const updated = { ...store, currentUser: null };
-    saveStore(updated);
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
     router.push('/login');
   };
 

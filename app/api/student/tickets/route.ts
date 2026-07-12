@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { SupportTicket, User, AuditLog } from '@/lib/models';
-import { verifyAccessToken } from '@/lib/jwt';
+import { getAuthUser } from '@/lib/jwt';
 
 // ==========================================
 // GET: FETCH STUDENT'S TICKETS
@@ -11,17 +11,12 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     // Auth Check
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
-    const tickets = await SupportTicket.find({ studentId: decoded.id }).sort({ createdAt: -1 });
+    const tickets = await SupportTicket.find({ studentId: user._id }).sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,
@@ -49,25 +44,15 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Auth Check
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
     const { subject, message } = await req.json();
 
     if (!subject || !message) {
       return NextResponse.json({ success: false, message: 'Subject and message are required fields.', data: {}, errors: ['Missing fields'] }, { status: 400 });
-    }
-
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return NextResponse.json({ success: false, message: 'Account not found.', data: {}, errors: ['Not found'] }, { status: 404 });
     }
 
     const newTicket = new SupportTicket({

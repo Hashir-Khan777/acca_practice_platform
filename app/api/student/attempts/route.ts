@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { Attempt, User, DailyStreak, AuditLog } from '@/lib/models';
-import { verifyAccessToken } from '@/lib/jwt';
+import { Attempt, User, DailyStreak, AuditLog, Quiz } from '@/lib/models';
+import { getAuthUser } from '@/lib/jwt';
 
 // ==========================================
 // GET: LIST ATTEMPTS WITH FILTERS & PAGINATION
@@ -11,14 +11,9 @@ export async function GET(req: NextRequest) {
     await connectDB();
 
     // Auth Check
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
@@ -29,7 +24,7 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     // Build DB Query
-    const query: any = { userId: decoded.id };
+    const query: any = { userId: user._id };
 
     if (search) {
       query.$or = [
@@ -50,11 +45,28 @@ export async function GET(req: NextRequest) {
 
     const total = await Attempt.countDocuments(query);
 
+    const populatedAttempts = [];
+    for (const attempt of attempts) {
+      let questions: any[] = [];
+      if (attempt.quizId) {
+        try {
+          const quiz = await Quiz.findById(attempt.quizId);
+          if (quiz) {
+            questions = quiz.questions;
+          }
+        } catch (e) {}
+      }
+      populatedAttempts.push({
+        ...attempt.toObject(),
+        questions
+      });
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Attempts logs retrieved successfully.',
       data: {
-        attempts,
+        attempts: populatedAttempts,
         pagination: {
           total,
           page,
@@ -84,14 +96,9 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     // Auth Check
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
-    }
-    const token = authHeader.split(' ')[1];
-    const decoded = verifyAccessToken(token);
-    if (!decoded) {
-      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
     const body = await req.json();
@@ -103,7 +110,7 @@ export async function POST(req: NextRequest) {
 
     // Save Attempt
     const newAttempt = new Attempt({
-      userId: decoded.id,
+      userId: user._id,
       quizId,
       subject,
       topic,
@@ -121,20 +128,17 @@ export async function POST(req: NextRequest) {
     await newAttempt.save();
 
     // 1. Increment User solved counts
-    const user = await User.findById(decoded.id);
-    if (user) {
-      user.totalQuizzes += 1;
-      await user.save();
-    }
+    user.totalQuizzes += 1;
+    await user.save();
 
     // 2. STREAKS UPDATER LOGIC
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     
-    let streak = await DailyStreak.findOne({ userId: decoded.id });
+    let streak = await DailyStreak.findOne({ userId: user._id });
     if (!streak) {
       streak = new DailyStreak({
-        userId: decoded.id,
+        userId: user._id,
         currentStreak: 1,
         longestStreak: 1,
         lastPracticeDate: now
@@ -170,7 +174,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Create Audit Log
     const audit = new AuditLog({
-      user: decoded.email,
+      user: user.email,
       action: 'QUIZ_SUBMIT',
       details: `Completed practice quiz on ${topic} with a score of ${percentage}%.`,
       timestamp: new Date()

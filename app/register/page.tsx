@@ -48,72 +48,18 @@ export default function RegisterPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        localStorage.setItem('acca_access_token', result.data.token);
-        
-        const store = loadStore();
-        const updatedStore = {
-          ...store,
-          currentUser: result.data.user
-        };
-        saveStore(updatedStore);
         setIsSubmitting(false);
         setIsSuccess(true);
         return;
       } else {
-        if (res.status === 400) {
-          setError(result.message || 'Registration failed.');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn("Backend API not reachable. Falling back to client-side simulator.");
-    }
-
-    // Client-side simulation fallback
-    setTimeout(() => {
-      const store = loadStore();
-      const exists = store.users.some((u: any) => u.email.toLowerCase() === form.email.toLowerCase());
-
-      if (exists) {
-        setError('An account with this email already exists.');
+        setError(result.message || 'Registration failed.');
         setIsSubmitting(false);
         return;
       }
-
-      const nowStr = new Date().toISOString();
-      const newStudent: User = {
-        id: 'user-' + Date.now(),
-        name: form.name,
-        email: form.email,
-        role: 'student',
-        country: form.country,
-        accaLevel: form.accaLevel,
-        photo: `https://picsum.photos/seed/${form.name.replace(/\s+/g, '')}/200/200`,
-        createdAt: nowStr,
-        plan: 'free',
-        status: 'active',
-        lastLogin: nowStr,
-        totalQuizzes: 0
-      };
-
-      const updatedUsers = [...store.users, newStudent];
-      const updatedLogs = [
-        { id: 'log-' + Date.now(), user: form.email, action: 'REGISTER', details: `New student registration: Level: ${form.accaLevel}`, timestamp: nowStr },
-        ...store.auditLogs
-      ];
-
-      const updatedStore = {
-        ...store,
-        currentUser: newStudent,
-        users: updatedUsers,
-        auditLogs: updatedLogs
-      };
-
-      saveStore(updatedStore);
+    } catch (err: any) {
+      setError(err.message || 'Internal connection error. Database is not reachable.');
       setIsSubmitting(false);
-      setIsSuccess(true);
-    }, 1000);
+    }
   };
 
   return (
