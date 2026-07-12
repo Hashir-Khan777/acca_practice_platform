@@ -1,0 +1,111 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/db';
+import { SupportTicket, User, AuditLog } from '@/lib/models';
+import { verifyAccessToken } from '@/lib/jwt';
+
+// ==========================================
+// GET: FETCH STUDENT'S TICKETS
+// ==========================================
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+
+    // Auth Check
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyAccessToken(token);
+    if (!decoded) {
+      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    }
+
+    const tickets = await SupportTicket.find({ studentId: decoded.id }).sort({ createdAt: -1 });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Tickets retrieved successfully.',
+      data: { tickets },
+      errors: []
+    });
+
+  } catch (error: any) {
+    console.error('Get Tickets API Error:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to retrieve support tickets.',
+      data: {},
+      errors: [error.message || 'Unknown error occurred']
+    }, { status: 500 });
+  }
+}
+
+// ==========================================
+// POST: SUBMIT NEW TICKET
+// ==========================================
+export async function POST(req: NextRequest) {
+  try {
+    await connectDB();
+
+    // Auth Check
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Missing token'] }, { status: 401 });
+    }
+    const token = authHeader.split(' ')[1];
+    const decoded = verifyAccessToken(token);
+    if (!decoded) {
+      return NextResponse.json({ success: false, message: 'Invalid token session.', data: {}, errors: ['Token expired'] }, { status: 401 });
+    }
+
+    const { subject, message } = await req.json();
+
+    if (!subject || !message) {
+      return NextResponse.json({ success: false, message: 'Subject and message are required fields.', data: {}, errors: ['Missing fields'] }, { status: 400 });
+    }
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return NextResponse.json({ success: false, message: 'Account not found.', data: {}, errors: ['Not found'] }, { status: 404 });
+    }
+
+    const newTicket = new SupportTicket({
+      studentId: user._id,
+      studentName: user.name,
+      studentEmail: user.email,
+      subject,
+      message,
+      status: 'open',
+      createdAt: new Date(),
+      replies: []
+    });
+
+    await newTicket.save();
+
+    // Create Audit Log
+    const audit = new AuditLog({
+      user: user.email,
+      action: 'SUPPORT_TICKET_SUBMIT',
+      details: `Submitted support ticket regarding: ${subject}`,
+      timestamp: new Date()
+    });
+    await audit.save();
+
+    return NextResponse.json({
+      success: true,
+      message: 'Support ticket submitted successfully.',
+      data: { ticket: newTicket },
+      errors: []
+    });
+
+  } catch (error: any) {
+    console.error('Submit Ticket API Error:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to submit support ticket.',
+      data: {},
+      errors: [error.message || 'Unknown error occurred']
+    }, { status: 550 });
+  }
+}

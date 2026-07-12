@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { connectDB } from '@/lib/db';
+import { SupportTicket, AuditLog } from '@/lib/models';
+import { verifyAccessToken } from '@/lib/jwt';
+
+async function checkAdmin(req: NextRequest) {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+  const token = authHeader.split(' ')[1];
+  const decoded = verifyAccessToken(token);
+  if (!decoded || decoded.role !== 'admin') return null;
+  return decoded;
+}
+
+// ==========================================
+// GET: LIST ALL TICKETS IN THE SYSTEM
+// ==========================================
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+    const admin = await checkAdmin(req);
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'Unauthorized. Admin role required.', data: {}, errors: ['Forbidden'] }, { status: 403 });
+    }
+
+    const tickets = await SupportTicket.find().sort({ createdAt: -1 });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Platform tickets retrieved successfully.',
+      data: { tickets },
+      errors: []
+    });
+
+  } catch (error: any) {
+    console.error('Admin GET Tickets Error:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to retrieve support tickets list.',
+      data: {},
+      errors: [error.message || 'Unknown error occurred']
+    }, { status: 500 });
+  }
+}
+
+// ==========================================
+// PUT: REPLY TO TICKET & MARK CLOSED
+// ==========================================
+export async function PUT(req: NextRequest) {
+  try {
+    await connectDB();
+    const admin = await checkAdmin(req);
+    if (!admin) {
+      return NextResponse.json({ success: false, message: 'Unauthorized. Admin role required.', data: {}, errors: ['Forbidden'] }, { status: 403 });
+    }
+
+    const { ticketId, replyMessage } = await req.json();
+
+    if (!ticketId || !replyMessage) {
+      return NextResponse.json({ success: false, message: 'Ticket ID and response body are required.', data: {}, errors: ['Missing fields'] }, { status: 400 });
+    }
+
+    const ticket = await SupportTicket.findById(ticketId);
+    if (!ticket) {
+      return NextResponse.json({ success: false, message: 'Support ticket not found.', data: {}, errors: ['Ticket not found'] }, { status: 404 });
+    }
+
+    ticket.replies.push({
+      sender: 'admin',
+      message: replyMessage,
+      date: new Date()
+    });
+
+    ticket.status = 'closed';
+    await ticket.save();
+
+    // Create Audit Log
+    const audit = new AuditLog({
+      user: admin.email,
+      action: 'SUPPORT_TICKET_REPLY',
+      details: `Replied and resolved ticket: ${ticketId}`,
+      timestamp: new Date()
+    });
+    await audit.save();
+
+    return NextResponse.json({
+      success: true,
+      message: 'Tutor reply successfully recorded and ticket closed.',
+      data: { ticket },
+      errors: []
+    });
+
+  } catch (error: any) {
+    console.error('Admin PUT Ticket Error:', error);
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to record support response.',
+      data: {},
+      errors: [error.message || 'Unknown error occurred']
+    }, { status: 550 });
+  }
+}
