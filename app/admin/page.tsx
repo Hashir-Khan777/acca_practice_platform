@@ -14,15 +14,34 @@ export default function AdminDashboardOverview() {
   const studentsCount = store.users.filter((u: any) => u.role === 'student').length;
   const activeStreakUsers = store.users.filter((u: any) => u.role === 'student' && u.plan === 'premium').length;
   
-  const dailyActivityData = [
-    { name: 'July 5', attempts: 1 },
-    { name: 'July 6', attempts: 2 },
-    { name: 'July 7', attempts: 1 },
-    { name: 'July 8', attempts: 3 },
-    { name: 'July 9', attempts: store.attempts.length > 2 ? 3 : 2 },
-    { name: 'July 10', attempts: store.attempts.length },
-    { name: 'July 11', attempts: store.attempts.length + 1 }
-  ];
+  // Calculate trailing 7 days attempts dynamically
+  const last7Days = Array.from({ length: 7 }).map((_, idx) => {
+    const d = new Date();
+    d.setDate(d.getDate() - idx);
+    const dateStr = d.toISOString().split('T')[0];
+    const name = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return {
+      dateStr,
+      name,
+      attempts: 0
+    };
+  }).reverse();
+
+  last7Days.forEach(day => {
+    day.attempts = store.attempts.filter((a: any) => {
+      try {
+        const aDate = new Date(a.date).toISOString().split('T')[0];
+        return aDate === day.dateStr;
+      } catch (e) {
+        return false;
+      }
+    }).length;
+  });
+
+  const dailyActivityData = last7Days.map(day => ({
+    name: day.name,
+    attempts: day.attempts
+  }));
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6">

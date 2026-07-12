@@ -36,16 +36,34 @@ export default function StudentDashboardOverview() {
     .map((a: any) => a.topic);
   const uniqueStrongTopics = Array.from(new Set(strongTopics)).slice(0, 3) as string[];
 
-  // Recharts assemblies
-  const weeklyPracticeData = [
-    { day: 'Mon', quizzes: 1 },
-    { day: 'Tue', quizzes: 2 },
-    { day: 'Wed', quizzes: 0 },
-    { day: 'Thu', quizzes: 1 },
-    { day: 'Fri', quizzes: store.attempts.length > 2 ? 2 : 1 },
-    { day: 'Sat', quizzes: store.attempts.filter((a: any) => a.date.includes('07-11') || a.date.includes('today')).length },
-    { day: 'Sun', quizzes: 0 }
-  ];
+  // Recharts assemblies - dynamic trailing 7 days
+  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const last7Days = Array.from({ length: 7 }).map((_, idx) => {
+    const d = new Date();
+    d.setDate(d.getDate() - idx);
+    return {
+      dateStr: d.toISOString().split('T')[0],
+      dayName: weekdays[d.getDay()],
+      quizzes: 0
+    };
+  }).reverse();
+
+  last7Days.forEach(day => {
+    const dayAttempts = store.attempts.filter((a: any) => {
+      try {
+        const aDate = new Date(a.date).toISOString().split('T')[0];
+        return aDate === day.dateStr;
+      } catch (e) {
+        return false;
+      }
+    });
+    day.quizzes = dayAttempts.length;
+  });
+
+  const weeklyPracticeData = last7Days.map(day => ({
+    day: day.dayName,
+    quizzes: day.quizzes
+  }));
 
   const subjectPerformanceData = store.subjects.map((sub: any) => {
     const subAttempts = store.attempts.filter((a: any) => a.subject === sub.name);
