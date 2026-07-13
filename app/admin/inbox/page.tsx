@@ -10,19 +10,24 @@ import { ContactMessage } from '@/lib/store';
 export default function AdminInboxPage() {
   const { store, updateStore, setSuccess } = useAdmin();
 
-  const handleDeleteMessage = (msgId: string) => {
+  const handleDeleteMessage = async (msgId: string) => {
     if (!store) return;
-    const updatedMessages = store.contactMessages.filter((m: any) => m.id !== msgId);
-    
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'CONTACT_MSG_DELETE', details: `Deleted public message: ${msgId}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
+    try {
+      const res = await fetch(`/api/admin/inbox?messageId=${msgId}`, { method: 'DELETE' });
+      if (res.ok) {
+        const updatedMessages = store.contactMessages.filter((m: any) => m.id !== msgId);
+        
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'CONTACT_MSG_DELETE', details: `Deleted public message: ${msgId}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updated = { ...store, contactMessages: updatedMessages, auditLogs: updatedLogs };
-    updateStore(updated);
-    setSuccess('Inbox message permanently purged.');
-    setTimeout(() => setSuccess(''), 3000);
+        const updated = { ...store, contactMessages: updatedMessages, auditLogs: updatedLogs };
+        updateStore(updated);
+        setSuccess('Inbox message permanently purged.');
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err: any) {}
   };
 
   if (!store) return null;

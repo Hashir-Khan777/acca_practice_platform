@@ -24,7 +24,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Unauthorized. Admin role required.', data: {}, errors: ['Forbidden'] }, { status: 403 });
     }
 
-    const messages = await ContactMessage.find().sort({ createdAt: -1 });
+    const rawMessages = await ContactMessage.find().sort({ createdAt: -1 });
+    const messages = rawMessages.map((m: any) => ({
+      id: m._id.toString(),
+      name: m.name,
+      email: m.email,
+      subject: m.subject,
+      message: m.message,
+      createdAt: m.createdAt,
+      status: m.status
+    }));
 
     return NextResponse.json({
       success: true,

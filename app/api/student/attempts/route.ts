@@ -185,7 +185,22 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Attempt logged successfully.',
       data: {
-        attempt: newAttempt,
+        attempt: {
+          id: newAttempt._id.toString(),
+          quizId: newAttempt.quizId,
+          subject: newAttempt.subject,
+          topic: newAttempt.topic,
+          difficulty: newAttempt.difficulty,
+          date: newAttempt.date,
+          score: newAttempt.score,
+          totalQuestions: newAttempt.totalQuestions,
+          percentage: newAttempt.percentage,
+          duration: newAttempt.duration,
+          answers: newAttempt.answers,
+          skipped: newAttempt.skipped,
+          correct: newAttempt.correct,
+          wrong: newAttempt.wrong
+        },
         streak: {
           currentStreak: streak.currentStreak,
           longestStreak: streak.longestStreak,

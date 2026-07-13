@@ -24,60 +24,82 @@ export default function AdminSyllabusPage() {
     }
   }, [store, newTopicSubjectId]);
 
-  const handleAddSubject = (e: React.FormEvent) => {
+  const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubCode || !newSubName || !store) return;
 
-    const exists = store.subjects.some((s: any) => s.code.toLowerCase() === newSubCode.toLowerCase());
-    if (exists) {
-      setError('A Subject with this code already exists.');
+    try {
+      const res = await fetch('/api/admin/syllabus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'SUBJECT',
+          code: newSubCode,
+          name: newSubName,
+          description: 'Syllabus content and practice questions managed by administrator.'
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const newSub = result.data.subject;
+        const updatedSubjects = [...store.subjects, newSub];
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'SUBJECT_ADD', details: `Added Subject ${newSub.code}: ${newSub.name}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
+
+        updateStore({ ...store, subjects: updatedSubjects, auditLogs: updatedLogs });
+        setNewSubCode('');
+        setNewSubName('');
+        setSuccess('New Subject successfully registered.');
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.message || 'Failed to register Subject.');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (e: any) {
+      setError(e.message || 'Network error occurred.');
       setTimeout(() => setError(''), 3000);
-      return;
     }
-
-    const newSub: Subject = {
-      id: 'sub-' + Date.now(),
-      code: newSubCode.toUpperCase(),
-      name: newSubName,
-      description: 'Syllabus content and practice questions managed by administrator.',
-      status: 'active'
-    };
-
-    const updatedSubjects = [...store.subjects, newSub];
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'SUBJECT_ADD', details: `Added Subject ${newSub.code}: ${newSub.name}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    updateStore({ ...store, subjects: updatedSubjects, auditLogs: updatedLogs });
-    setNewSubCode('');
-    setNewSubName('');
-    setSuccess('New Subject successfully registered.');
-    setTimeout(() => setSuccess(''), 3000);
   };
 
-  const handleAddTopic = (e: React.FormEvent) => {
+  const handleAddTopic = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTopicSubjectId || !newTopicName || !store) return;
 
-    const newTopic: Topic = {
-      id: 'top-' + Date.now(),
-      subjectId: newTopicSubjectId,
-      name: newTopicName,
-      description: 'Syllabus guidelines and AI practice scenario pool.',
-      difficulty: 'medium'
-    };
+    try {
+      const res = await fetch('/api/admin/syllabus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'TOPIC',
+          subjectId: newTopicSubjectId,
+          name: newTopicName,
+          description: 'Syllabus guidelines and AI practice scenario pool.',
+          difficulty: 'medium'
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const newTopic = result.data.topic;
+        const updatedTopics = [...store.topics, newTopic];
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'TOPIC_ADD', details: `Added Topic "${newTopic.name}" under subject ID ${newTopic.subjectId}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedTopics = [...store.topics, newTopic];
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'TOPIC_ADD', details: `Added Topic "${newTopicName}" under subject ID ${newTopicSubjectId}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    updateStore({ ...store, topics: updatedTopics, auditLogs: updatedLogs });
-    setNewTopicName('');
-    setSuccess('New topic added under selected subject.');
-    setTimeout(() => setSuccess(''), 3000);
+        updateStore({ ...store, topics: updatedTopics, auditLogs: updatedLogs });
+        setNewTopicName('');
+        setSuccess('New topic added under selected subject.');
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError(result.message || 'Failed to register Topic.');
+        setTimeout(() => setError(''), 3000);
+      }
+    } catch (e: any) {
+      setError(e.message || 'Network error occurred.');
+      setTimeout(() => setError(''), 3000);
+    }
   };
 
   if (!store) return null;

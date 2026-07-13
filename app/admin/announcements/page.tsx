@@ -13,30 +13,36 @@ export default function AdminAnnouncementsPage() {
   const [annTitle, setAnnTitle] = React.useState('');
   const [annMessage, setAnnMessage] = React.useState('');
 
-  const handleCreateAnnouncement = (e: React.FormEvent) => {
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!annTitle || !annMessage || !store) return;
 
-    const newAnn: Announcement = {
-      id: 'ann-' + Date.now(),
-      title: annTitle,
-      message: annMessage,
-      targetAudience: 'all',
-      scheduleDate: new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    };
+    try {
+      const res = await fetch('/api/admin/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: annTitle,
+          message: annMessage,
+          targetAudience: 'all'
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const newAnn = result.data.announcement;
+        const updatedAnnouncements = [newAnn, ...store.announcements];
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'ANNOUNCEMENT_CREATE', details: `Title: "${annTitle}"`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedAnnouncements = [newAnn, ...store.announcements];
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'ANNOUNCEMENT_CREATE', details: `Title: "${annTitle}"`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    updateStore({ ...store, announcements: updatedAnnouncements, auditLogs: updatedLogs });
-    setAnnTitle('');
-    setAnnMessage('');
-    setSuccess('Global announcement dispatched to student portal notifications.');
-    setTimeout(() => setSuccess(''), 3000);
+        updateStore({ ...store, announcements: updatedAnnouncements, auditLogs: updatedLogs });
+        setAnnTitle('');
+        setAnnMessage('');
+        setSuccess('Global announcement dispatched to student portal notifications.');
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err: any) {}
   };
 
   if (!store) return null;

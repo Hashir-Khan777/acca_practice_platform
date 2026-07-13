@@ -48,7 +48,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Contact message successfully saved to database.',
-      data: { message: newMessage },
+      data: {
+        message: {
+          id: newMessage._id.toString(),
+          name: newMessage.name,
+          email: newMessage.email,
+          subject: newMessage.subject,
+          message: newMessage.message,
+          createdAt: newMessage.createdAt,
+          status: newMessage.status
+        }
+      },
       errors: []
     });
 

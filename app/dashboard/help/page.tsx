@@ -14,38 +14,41 @@ export default function StudentHelpCenterPage() {
   const [ticketMessage, setTicketMessage] = React.useState('');
   const [ticketSuccess, setTicketSuccess] = React.useState(false);
 
-  const handleCreateTicket = (e: React.FormEvent) => {
+  const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ticketSubject || !ticketMessage || !store) return;
 
-    const newTicket: SupportTicket = {
-      id: 'tkt-' + Date.now(),
-      studentName: store.currentUser.name,
-      studentEmail: store.currentUser.email,
-      subject: ticketSubject,
-      message: ticketMessage,
-      status: 'open',
-      createdAt: new Date().toISOString(),
-      replies: []
-    };
+    try {
+      const res = await fetch('/api/student/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: ticketSubject,
+          message: ticketMessage
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const newTicket = result.data.ticket;
+        const updatedTickets = [newTicket, ...store.tickets];
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'SUPPORT_TICKET_CREATE', details: `Subject: "${ticketSubject}"`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedTickets = [newTicket, ...store.tickets];
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'SUPPORT_TICKET_CREATE', details: `Subject: "${ticketSubject}"`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
+        const updatedStore = {
+          ...store,
+          tickets: updatedTickets,
+          auditLogs: updatedLogs
+        };
 
-    const updatedStore = {
-      ...store,
-      tickets: updatedTickets,
-      auditLogs: updatedLogs
-    };
-
-    updateStore(updatedStore);
-    setTicketSubject('');
-    setTicketMessage('');
-    setTicketSuccess(true);
-    setTimeout(() => setTicketSuccess(false), 3000);
+        updateStore(updatedStore);
+        setTicketSubject('');
+        setTicketMessage('');
+        setTicketSuccess(true);
+        setTimeout(() => setTicketSuccess(false), 3000);
+      }
+    } catch (err: any) {}
   };
 
   if (!store) return null;

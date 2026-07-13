@@ -19,9 +19,24 @@ async function checkAdmin(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    // Retrieve all active subjects
-    const subjects = await Subject.find().sort({ code: 1 });
-    const topics = await Topic.find().sort({ name: 1 });
+    const rawSubjects = await Subject.find().sort({ code: 1 });
+    const rawTopics = await Topic.find().sort({ name: 1 });
+
+    const subjects = rawSubjects.map((s: any) => ({
+      id: s._id.toString(),
+      code: s.code,
+      name: s.name,
+      description: s.description,
+      status: s.status
+    }));
+
+    const topics = rawTopics.map((t: any) => ({
+      id: t._id.toString(),
+      subjectId: t.subjectId.toString(),
+      name: t.name,
+      description: t.description,
+      difficulty: t.difficulty
+    }));
 
     return NextResponse.json({
       success: true,
@@ -86,7 +101,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'New Subject registered successfully.',
-        data: { subject: newSubject },
+        data: {
+          subject: {
+            id: newSubject._id.toString(),
+            code: newSubject.code,
+            name: newSubject.name,
+            description: newSubject.description,
+            status: newSubject.status
+          }
+        },
         errors: []
       });
 
@@ -115,7 +138,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         message: 'New Topic registered successfully under Subject.',
-        data: { topic: newTopic },
+        data: {
+          topic: {
+            id: newTopic._id.toString(),
+            subjectId: newTopic.subjectId.toString(),
+            name: newTopic.name,
+            description: newTopic.description,
+            difficulty: newTopic.difficulty
+          }
+        },
         errors: []
       });
 

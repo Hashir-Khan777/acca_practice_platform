@@ -33,34 +33,40 @@ export default function StudentProfilePage() {
     }
   }, [store]);
 
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profileName || !profileEmail || !store) return;
 
-    const updatedUser: User = {
-      ...store.currentUser,
-      name: profileName,
-      email: profileEmail,
-      country: profileCountry,
-      accaLevel: profileLevel
-    };
+    try {
+      const res = await fetch('/api/student/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: profileName,
+          email: profileEmail,
+          country: profileCountry,
+          accaLevel: profileLevel
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const updatedUser = result.data.user;
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'PROFILE_UPDATE', details: 'Updated user personal details', timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedUsers = store.users.map((u: any) => u.id === store.currentUser.id ? updatedUser : u);
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'PROFILE_UPDATE', details: 'Updated user personal details', timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
+        const updatedStore = {
+          ...store,
+          currentUser: updatedUser,
+          auditLogs: updatedLogs
+        };
 
-    const updatedStore = {
-      ...store,
-      currentUser: updatedUser,
-      users: updatedUsers,
-      auditLogs: updatedLogs
-    };
-
-    updateStore(updatedStore);
-    setProfileSuccess(true);
-    setTimeout(() => setProfileSuccess(false), 3000);
+        updateStore(updatedStore);
+        setProfileSuccess(true);
+        setTimeout(() => setProfileSuccess(false), 3000);
+      }
+    } catch (err: any) {}
   };
 
   if (!store) return null;

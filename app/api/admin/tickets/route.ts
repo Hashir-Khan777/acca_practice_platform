@@ -24,7 +24,22 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Unauthorized. Admin role required.', data: {}, errors: ['Forbidden'] }, { status: 403 });
     }
 
-    const tickets = await SupportTicket.find().sort({ createdAt: -1 });
+    const rawTickets = await SupportTicket.find().sort({ createdAt: -1 });
+    const tickets = rawTickets.map((t: any) => ({
+      id: t._id.toString(),
+      studentId: t.studentId?.toString(),
+      studentName: t.studentName,
+      studentEmail: t.studentEmail,
+      subject: t.subject,
+      message: t.message,
+      status: t.status,
+      createdAt: t.createdAt,
+      replies: t.replies.map((r: any) => ({
+        sender: r.sender,
+        message: r.message,
+        date: r.date
+      }))
+    }));
 
     return NextResponse.json({
       success: true,
@@ -87,7 +102,23 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Tutor reply successfully recorded and ticket closed.',
-      data: { ticket },
+      data: {
+        ticket: {
+          id: ticket._id.toString(),
+          studentId: ticket.studentId?.toString(),
+          studentName: ticket.studentName,
+          studentEmail: ticket.studentEmail,
+          subject: ticket.subject,
+          message: ticket.message,
+          status: ticket.status,
+          createdAt: ticket.createdAt,
+          replies: ticket.replies.map((r: any) => ({
+            sender: r.sender,
+            message: r.message,
+            date: r.date
+          }))
+        }
+      },
       errors: []
     });
 

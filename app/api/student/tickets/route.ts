@@ -80,7 +80,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Support ticket submitted successfully.',
-      data: { ticket: newTicket },
+      data: {
+        ticket: {
+          id: newTicket._id.toString(),
+          studentId: newTicket.studentId.toString(),
+          studentName: newTicket.studentName,
+          studentEmail: newTicket.studentEmail,
+          subject: newTicket.subject,
+          message: newTicket.message,
+          status: newTicket.status,
+          createdAt: newTicket.createdAt,
+          replies: []
+        }
+      },
       errors: []
     });
 

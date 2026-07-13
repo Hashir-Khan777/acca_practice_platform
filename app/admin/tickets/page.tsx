@@ -13,32 +13,38 @@ export default function AdminTicketsPage() {
   const [replyTicketId, setReplyTicketId] = React.useState('');
   const [ticketReplyText, setTicketReplyText] = React.useState('');
 
-  const handleReplyTicket = (e: React.FormEvent) => {
+  const handleReplyTicket = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!replyTicketId || !ticketReplyText || !store) return;
 
-    const matched = store.tickets.find((t: any) => t.id === replyTicketId);
-    if (!matched) return;
+    try {
+      const res = await fetch('/api/admin/tickets', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: replyTicketId,
+          replyMessage: ticketReplyText
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const updatedTicket = result.data.ticket;
+        const updatedTickets = store.tickets.map((t: any) =>
+          t.id === replyTicketId ? updatedTicket : t
+        );
 
-    const updatedReplies = [
-      ...(matched.replies || []),
-      { sender: 'admin' as const, message: ticketReplyText, date: new Date().toISOString() }
-    ];
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'SUPPORT_TICKET_REPLY', details: `Replied and closed ticket: ${replyTicketId}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedTickets = store.tickets.map((t: any) =>
-      t.id === replyTicketId ? { ...t, status: 'closed' as const, replies: updatedReplies } : t
-    );
-
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'SUPPORT_TICKET_REPLY', details: `Replied and closed ticket: ${replyTicketId}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    updateStore({ ...store, tickets: updatedTickets, auditLogs: updatedLogs });
-    setReplyTicketId('');
-    setTicketReplyText('');
-    setSuccess('Ticket reply sent and marked as closed.');
-    setTimeout(() => setSuccess(''), 3000);
+        updateStore({ ...store, tickets: updatedTickets, auditLogs: updatedLogs });
+        setReplyTicketId('');
+        setTicketReplyText('');
+        setSuccess('Ticket reply sent and marked as closed.');
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err: any) {}
   };
 
   if (!store) return null;

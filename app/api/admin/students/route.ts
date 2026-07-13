@@ -50,10 +50,24 @@ export async function GET(req: NextRequest) {
       query.status = status;
     }
 
-    const students = await User.find(query)
+    const rawStudents = await User.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+
+    const students = rawStudents.map((s: any) => ({
+      id: s._id.toString(),
+      name: s.name,
+      email: s.email,
+      role: s.role,
+      plan: s.plan,
+      status: s.status,
+      country: s.country,
+      accaLevel: s.accaLevel,
+      photo: s.photo || `https://picsum.photos/seed/${s.name.replace(/\s+/g, '')}/200/200`,
+      createdAt: s.createdAt,
+      totalQuizzes: s.totalQuizzes
+    }));
 
     const total = await User.countDocuments(query);
 

@@ -9,40 +9,60 @@ import { User } from '@/lib/store';
 export default function AdminStudentsPage() {
   const { store, updateStore, setSuccess } = useAdmin();
 
-  const handleTogglePlan = (userId: string) => {
-    const matched = store.users.find((u: any) => u.id === userId);
-    if (!matched) return;
+  const handleTogglePlan = async (userId: string) => {
+    try {
+      const res = await fetch('/api/admin/students', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          action: 'TOGGLE_PLAN'
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const updatedStudent = result.data.student;
+        const updatedUsers = store.users.map((u: any) => u.id === userId ? updatedStudent : u);
+        
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'STUDENT_PLAN_UPDATE', details: `Changed plan for ${updatedStudent.email} to ${updatedStudent.plan.toUpperCase()}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const nextPlan = matched.plan === 'premium' ? 'free' : 'premium';
-    const updatedUsers = store.users.map((u: any) => u.id === userId ? { ...u, plan: nextPlan } : u);
-    
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'STUDENT_PLAN_UPDATE', details: `Changed plan for ${matched.email} to ${nextPlan}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    const updated = { ...store, users: updatedUsers, auditLogs: updatedLogs };
-    updateStore(updated);
-    setSuccess(`Successfully updated subscription plan to ${nextPlan.toUpperCase()}.`);
-    setTimeout(() => setSuccess(''), 3000);
+        const updated = { ...store, users: updatedUsers, auditLogs: updatedLogs };
+        updateStore(updated);
+        setSuccess(`Successfully updated subscription plan to ${updatedStudent.plan.toUpperCase()}.`);
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err: any) {}
   };
 
-  const handleToggleStatus = (userId: string) => {
-    const matched = store.users.find((u: any) => u.id === userId);
-    if (!matched) return;
+  const handleToggleStatus = async (userId: string) => {
+    try {
+      const res = await fetch('/api/admin/students', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          action: 'TOGGLE_STATUS'
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const updatedStudent = result.data.student;
+        const updatedUsers = store.users.map((u: any) => u.id === userId ? updatedStudent : u);
 
-    const nextStatus = matched.status === 'active' ? 'suspended' : 'active';
-    const updatedUsers = store.users.map((u: any) => u.id === userId ? { ...u, status: nextStatus } : u);
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: 'Admin', action: 'STUDENT_STATUS_UPDATE', details: `Status for ${updatedStudent.email} changed to ${updatedStudent.status}`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: 'Admin', action: 'STUDENT_STATUS_UPDATE', details: `Status for ${matched.email} changed to ${nextStatus}`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
-
-    const updated = { ...store, users: updatedUsers, auditLogs: updatedLogs };
-    updateStore(updated);
-    setSuccess(`Student account has been ${nextStatus}.`);
-    setTimeout(() => setSuccess(''), 3000);
+        const updated = { ...store, users: updatedUsers, auditLogs: updatedLogs };
+        updateStore(updated);
+        setSuccess(`Student account has been ${updatedStudent.status}.`);
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err: any) {}
   };
 
   return (

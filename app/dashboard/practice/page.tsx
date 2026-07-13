@@ -229,7 +229,7 @@ export default function StudentPracticeQuizPage() {
     });
   };
 
-  const handleSubmitQuiz = (timeExpired = false) => {
+  const handleSubmitQuiz = async (timeExpired = false) => {
     if (!activeQuiz) return;
     setShowSubmitModal(false);
 
@@ -256,58 +256,64 @@ export default function StudentPracticeQuizPage() {
 
     const percentage = Math.round((correctCount / activeQuiz.questions.length) * 100);
 
-    const newAttempt: Attempt = {
-      id: 'att-' + Date.now(),
-      quizId: activeQuiz.id,
-      subject: activeQuiz.subject,
-      topic: activeQuiz.topic,
-      difficulty: activeQuiz.difficulty,
-      date: new Date().toISOString(),
-      score: correctCount,
-      totalQuestions: activeQuiz.questions.length,
-      percentage: percentage,
-      duration: duration,
-      answers: activeQuizAnswers,
-      skipped: skippedCount,
-      correct: correctCount,
-      wrong: wrongCount
-    };
+    try {
+      const res = await fetch('/api/student/attempts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: activeQuiz.id,
+          subject: activeQuiz.subject,
+          topic: activeQuiz.topic,
+          difficulty: activeQuiz.difficulty,
+          score: correctCount,
+          totalQuestions: activeQuiz.questions.length,
+          percentage: percentage,
+          duration: duration,
+          answers: activeQuizAnswers,
+          skipped: skippedCount,
+          correct: correctCount,
+          wrong: wrongCount
+        })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        const savedAttempt = result.data.attempt;
+        const updatedStreak = result.data.streak;
+        
+        const updatedCurrentUser = {
+          ...store.currentUser,
+          totalQuizzes: store.currentUser.totalQuizzes + 1
+        };
 
-    const updatedStreak = updateStreakOnPractice(store.streak);
-    
-    const updatedCurrentUser = {
-      ...store.currentUser,
-      totalQuizzes: store.currentUser.totalQuizzes + 1
-    };
+        const updatedUsers = store.users.map((u: any) => u.id === store.currentUser.id ? updatedCurrentUser : u);
+        const updatedAttempts = [savedAttempt, ...store.attempts];
+        
+        const updatedLogs = [
+          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'QUIZ_SUBMIT', details: `Completed ${activeQuiz.topic} quiz. Score: ${percentage}%`, timestamp: new Date().toISOString() },
+          ...store.auditLogs
+        ];
 
-    const updatedUsers = store.users.map((u: any) => u.id === store.currentUser.id ? updatedCurrentUser : u);
-    const updatedAttempts = [newAttempt, ...store.attempts];
-    
-    const updatedLogs = [
-      { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'QUIZ_SUBMIT', details: `Completed ${activeQuiz.topic} quiz. Score: ${percentage}%`, timestamp: new Date().toISOString() },
-      ...store.auditLogs
-    ];
+        const updatedStore = {
+          ...store,
+          currentUser: updatedCurrentUser,
+          streak: updatedStreak,
+          users: updatedUsers,
+          attempts: updatedAttempts,
+          auditLogs: updatedLogs
+        };
 
-    const updatedStore = {
-      ...store,
-      currentUser: updatedCurrentUser,
-      streak: updatedStreak,
-      users: updatedUsers,
-      attempts: updatedAttempts,
-      auditLogs: updatedLogs
-    };
+        updateStore(updatedStore);
+        router.push(`/dashboard/practice?attemptId=${savedAttempt.id}`);
 
-    updateStore(updatedStore);
-    setLatestAttempt(newAttempt);
-    setActiveQuiz(null);
-
-    // Dispatch streak notifications
-    if (updatedStreak.currentStreak > store.streak.currentStreak) {
-      setNotifications([
-        { id: 'n-streak-' + Date.now(), title: 'Streak Booster!', desc: `Awesome! You maintained your daily study streak. It is now at ${updatedStreak.currentStreak} days.`, date: 'Just now', read: false },
-        ...notifications
-      ]);
-    }
+        // Dispatch streak notifications
+        if (updatedStreak.currentStreak > store.streak.currentStreak) {
+          setNotifications([
+            { id: 'n-streak-' + Date.now(), title: 'Streak Booster!', desc: `Awesome! You maintained your daily study streak. It is now at ${updatedStreak.currentStreak} days.`, date: 'Just now', read: false },
+            ...notifications
+          ]);
+        }
+      }
+    } catch (err: any) {}
   };
 
   return (

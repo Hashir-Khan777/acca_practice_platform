@@ -5,7 +5,6 @@ import PageWrapper from '@/components/PageWrapper';
 import { Button, Card, Input, Badge } from '@/components/UI';
 import { Mail, Phone, MapPin, CheckCircle, Globe, Send } from 'lucide-react';
 import { motion } from 'motion/react';
-import { loadStore, saveStore } from '@/lib/store';
 
 export default function ContactPage() {
   const [form, setForm] = React.useState({ name: '', email: '', subject: '', message: '' });
@@ -50,56 +49,17 @@ export default function ContactPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
-        // Synchronize with simulated localStorage store too
-        const store = loadStore();
-        const newMessage = {
-          id: result.data.message.id || 'msg-' + Date.now(),
-          name: form.name,
-          email: form.email,
-          subject: form.subject,
-          message: form.message,
-          createdAt: new Date().toISOString(),
-          status: 'unread' as const
-        };
-        const updatedMessages = [newMessage, ...store.contactMessages];
-        const updatedStore = { ...store, contactMessages: updatedMessages };
-        saveStore(updatedStore);
-
         setIsSubmitting(false);
         setIsSuccess(true);
         setForm({ name: '', email: '', subject: '', message: '' });
-        return;
+      } else {
+        setErrors({ submit: result.message || 'Submission failed.' });
+        setIsSubmitting(false);
       }
-    } catch (err) {
-      console.warn("Backend Contact API failed, falling back to simulator:", err);
-    }
-
-    // Save contact message to store so it appears in Admin Inbox
-    setTimeout(() => {
-      const store = loadStore();
-      const newMessage = {
-        id: 'msg-' + Date.now(),
-        name: form.name,
-        email: form.email,
-        subject: form.subject,
-        message: form.message,
-        createdAt: new Date().toISOString(),
-        status: 'unread' as const
-      };
-      
-      const updatedMessages = [newMessage, ...store.contactMessages];
-      const updatedLogs = [
-        { id: 'log-' + Date.now(), user: 'public_visitor', action: 'CONTACT_SUBMIT', details: `New inquiry: "${form.subject}" by ${form.email}`, timestamp: new Date().toISOString() },
-        ...store.auditLogs
-      ];
-      
-      const updated = { ...store, contactMessages: updatedMessages, auditLogs: updatedLogs };
-      saveStore(updated);
-
+    } catch (err: any) {
+      setErrors({ submit: err.message || 'Database connection error.' });
       setIsSubmitting(false);
-      setIsSuccess(true);
-      setForm({ name: '', email: '', subject: '', message: '' });
-    }, 1200);
+    }
   };
 
   return (

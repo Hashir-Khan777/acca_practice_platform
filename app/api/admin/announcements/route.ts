@@ -19,7 +19,15 @@ async function checkAdmin(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
-    const announcements = await Announcement.find().sort({ createdAt: -1 });
+    const rawAnnouncements = await Announcement.find().sort({ createdAt: -1 });
+    const announcements = rawAnnouncements.map((a: any) => ({
+      id: a._id.toString(),
+      title: a.title,
+      message: a.message,
+      targetAudience: a.targetAudience,
+      scheduleDate: a.scheduleDate,
+      createdAt: a.createdAt
+    }));
 
     return NextResponse.json({
       success: true,
@@ -78,7 +86,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Announcement bulletin successfully published to students.',
-      data: { announcement: newAnn },
+      data: {
+        announcement: {
+          id: newAnn._id.toString(),
+          title: newAnn.title,
+          message: newAnn.message,
+          targetAudience: newAnn.targetAudience,
+          scheduleDate: newAnn.scheduleDate,
+          createdAt: newAnn.createdAt
+        }
+      },
       errors: []
     });
 
