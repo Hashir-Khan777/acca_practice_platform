@@ -49,71 +49,59 @@ You must create realistic, rigorous ACCA questions that directly align with the 
 Each question must include 4 distinct, plausible options, a list of correct answers (usually 1 option), a comprehensive, professional explanation referencing appropriate standards (e.g., IAS, IFRS, ISA, etc.), and the type.
 `;
 
-    let parsedQuestions = null;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (attempts < maxAttempts) {
-      try {
-        const response = await ai.models.generateContent({
-          model: "gemini-3.5-flash",
-          contents: prompt,
-          config: {
-            systemInstruction: "You are an elite ACCA exam designer and accounting professor. You generate authentic, challenging exam questions. You always return responses in the requested JSON format and never output any markdown formatting, notes, preambles, or postscripts.",
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  id: {
-                    type: Type.INTEGER,
-                    description: "Sequential question index starting from 1"
-                  },
-                  question: {
-                    type: Type.STRING,
-                    description: "The ACCA exam question text, scenarios, or calculations"
-                  },
-                  options: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                    description: "List of 4 distinct and realistic multiple choice answers"
-                  },
-                  correct_answer: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                    description: "An array containing the exact matching correct option text"
-                  },
-                  explanation: {
-                    type: Type.STRING,
-                    description: "A detailed professional explanation citing ACCA syllabus concepts and accounting/audit standards"
-                  },
-                  type: {
-                    type: Type.STRING,
-                    description: "The category of the question (e.g. single)"
-                  }
-                },
-                required: ["id", "question", "options", "correct_answer", "explanation", "type"]
+    // Fetch output using correct production model "gemini-3.5-flash"
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash", 
+      contents: prompt,
+      config: {
+        systemInstruction: "You are an elite ACCA exam designer and accounting professor. You generate authentic, challenging exam questions.",
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              id: {
+                type: Type.INTEGER,
+                description: "Sequential question index starting from 1"
+              },
+              question: {
+                type: Type.STRING,
+                description: "The ACCA exam question text, scenarios, or calculations"
+              },
+              options: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "List of 4 distinct and realistic multiple choice answers"
+              },
+              correct_answer: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "An array containing the exact matching correct option text"
+              },
+              explanation: {
+                type: Type.STRING,
+                description: "A detailed professional explanation citing ACCA syllabus concepts and accounting/audit standards"
+              },
+              type: {
+                type: Type.STRING,
+                description: "The category of the question (e.g. single)"
               }
-            }
+            },
+            required: ["id", "question", "options", "correct_answer", "explanation", "type"]
           }
-        });
-
-        const textOutput = response.text;
-        if (!textOutput) {
-          throw new Error("Empty response returned from Gemini API");
-        }
-
-        parsedQuestions = JSON.parse(textOutput.trim());
-        break; // Parsing succeeded, exit loop
-      } catch (err: any) {
-        attempts++;
-        console.warn(`JSON validation failed on attempt ${attempts}. Error: ${err.message}`);
-        if (attempts >= maxAttempts) {
-          throw new Error("Failed to receive a valid JSON schema from Gemini after multiple attempts.");
         }
       }
+    });
+
+    // CORRECTED: response.text is a property string, not a method!
+    const textOutput = response.text; 
+    if (!textOutput) {
+      throw new Error("Empty response returned from Gemini API");
     }
+
+    // Parsing is safe because structured output strictly adheres to the responseSchema layout
+    const parsedQuestions = JSON.parse(textOutput.trim());
 
     // Save generated quiz to MongoDB
     const newQuiz = new Quiz({

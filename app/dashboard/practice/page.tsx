@@ -6,9 +6,9 @@ import { motion } from 'motion/react';
 import { useDashboard } from '../context';
 import { Button, Card, Badge, Input, Select, Progress, Dialog } from '@/components/UI';
 import {
-  BookOpen, Clock, Sparkles, Bookmark, ChevronRight, Check, AlertTriangle, CheckCircle, ArrowRight
+  BookOpen, Clock, Sparkles, Bookmark, ChevronRight, Check
 } from 'lucide-react';
-import { updateStreakOnPractice, Quiz, Attempt, Question } from '@/lib/store';
+import { Quiz } from '@/lib/store';
 
 export default function StudentPracticeQuizPage() {
   const router = useRouter();
@@ -37,8 +37,7 @@ export default function StudentPracticeQuizPage() {
   const [showSubmitModal, setShowSubmitModal] = React.useState(false);
   const [quizStartTime, setQuizStartTime] = React.useState<Date | null>(null);
 
-  // Result State
-  const [latestAttempt, setLatestAttempt] = React.useState<Attempt | null>(null);
+
 
   React.useEffect(() => {
     if (store) {
@@ -66,18 +65,7 @@ export default function StudentPracticeQuizPage() {
     }
   }, [store, searchParams]);
 
-  // Load a past attempt if specified in URL query parameters
-  React.useEffect(() => {
-    if (attemptIdParam && store) {
-      const match = store.attempts.find((a: any) => a.id === attemptIdParam);
-      if (match) {
-        setLatestAttempt(match);
-        setActiveQuiz(null);
-      }
-    } else {
-      setLatestAttempt(null);
-    }
-  }, [attemptIdParam, store]);
+
 
   // Active Quiz Timed Engine Tick
   React.useEffect(() => {
@@ -117,11 +105,11 @@ export default function StudentPracticeQuizPage() {
     const today = new Date().toISOString().split('T')[0];
     const todayAttempts = store.attempts.filter((a: any) => a.date && a.date.startsWith(today)).length;
 
-    if (store.currentUser.plan === 'free' && todayAttempts >= 5) {
-      alert("You have reached your free daily limit of 5 quizzes. Please upgrade to Full-Pass Premium for unlimited AI generations!");
-      setShowUpgradeModal(true);
-      return;
-    }
+    // if (store.currentUser.plan === 'free' && todayAttempts >= 5) {
+    //   alert("You have reached your free daily limit of 5 quizzes. Please upgrade to Full-Pass Premium for unlimited AI generations!");
+    //   setShowUpgradeModal(true);
+    //   return;
+    // }
 
     setIsGenerating(true);
     setGenProgress(10);
@@ -211,7 +199,6 @@ export default function StudentPracticeQuizPage() {
     }
 
     setQuizStartTime(new Date());
-    setLatestAttempt(null);
   };
 
   const toggleBookmark = (qId: number) => {
@@ -279,6 +266,8 @@ export default function StudentPracticeQuizPage() {
       if (res.ok && result.success) {
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
+
+        router.push(`/dashboard/history/analysis?attemptId=${savedAttempt.id}`);
         
         const updatedCurrentUser = {
           ...store.currentUser,
@@ -303,7 +292,6 @@ export default function StudentPracticeQuizPage() {
         };
 
         updateStore(updatedStore);
-        router.push(`/dashboard/practice?attemptId=${savedAttempt.id}`);
 
         // Dispatch streak notifications
         if (updatedStreak.currentStreak > store.streak.currentStreak) {
@@ -313,7 +301,9 @@ export default function StudentPracticeQuizPage() {
           ]);
         }
       }
-    } catch (err: any) {}
+    } catch (err: any) {
+      console.log(err, 'err')
+    }
   };
 
   return (
@@ -337,7 +327,7 @@ export default function StudentPracticeQuizPage() {
       )}
 
       {/* 2. QUIZ CONFIGURATION FORM */}
-      {!isGenerating && !activeQuiz && !latestAttempt && (
+      {!isGenerating && !activeQuiz && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-2xl">
           <div className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-900 pb-4">
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">AI Practice Generator</h2>
@@ -597,112 +587,6 @@ export default function StudentPracticeQuizPage() {
               </div>
             </div>
           </Dialog>
-        </motion.div>
-      )}
-
-      {/* 4. QUIZ RESULTS ANALYSIS PRESENTATION */}
-      {!isGenerating && !activeQuiz && latestAttempt && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-4xl">
-          <div className={`p-6 border rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left ${
-            latestAttempt.percentage >= 50
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-slate-950 dark:text-white'
-              : 'bg-rose-500/10 border-rose-500/20 text-slate-950 dark:text-white'
-          }`}>
-            <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-full text-white ${latestAttempt.percentage >= 50 ? 'bg-emerald-500' : 'bg-rose-500'}`}>
-                {latestAttempt.percentage >= 50 ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
-              </div>
-              <div className="flex flex-col">
-                <Badge variant={latestAttempt.percentage >= 50 ? 'success' : 'danger'} className="w-fit mb-1">
-                  {latestAttempt.percentage >= 50 ? 'Exam Passed' : 'Fail (Needs Practice)'}
-                </Badge>
-                <h2 className="text-lg font-extrabold leading-tight">
-                  {latestAttempt.percentage >= 50 ? 'Congratulations, you surpassed the ACCA threshold!' : 'A bit short this time. Tweak your concepts and retry.'}
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => {
-                if (attemptIdParam) {
-                  router.push('/dashboard/practice');
-                } else {
-                  setLatestAttempt(null);
-                }
-              }}>
-                {attemptIdParam ? 'Go to Generator' : 'Practice Again'}
-              </Button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Card className="p-4 text-center">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-extrabold">Final Score</span>
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white block mt-1">{latestAttempt.percentage}%</span>
-            </Card>
-            <Card className="p-4 text-center">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-extrabold">Correct Answers</span>
-              <span className="text-2xl font-extrabold text-emerald-500 block mt-1">{latestAttempt.correct}</span>
-            </Card>
-            <Card className="p-4 text-center">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-extrabold">Wrong / Skipped</span>
-              <span className="text-2xl font-extrabold text-rose-500 block mt-1">{latestAttempt.wrong} / {latestAttempt.skipped}</span>
-            </Card>
-            <Card className="p-4 text-center">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-extrabold">Time Taken</span>
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white block mt-1">
-                {Math.floor(latestAttempt.duration / 60)}:{(latestAttempt.duration % 60).toString().padStart(2, '0')}
-              </span>
-            </Card>
-          </div>
-
-          <div className="flex flex-col gap-4 text-left mt-2">
-            <span className="text-xs font-mono uppercase tracking-widest text-slate-400 font-extrabold">Detailed Question-By-Question Analysis</span>
-            {(() => {
-              const fallbackQs = latestAttempt.questions || [];
-              
-              return fallbackQs.map((q: Question, idx: number) => {
-                const userAns = latestAttempt.answers[q.id] || [];
-                const isCorrect = q.correct_answer.some(ans => userAns.includes(ans));
-                
-                return (
-                  <Card key={idx} className={`p-6 border-l-4 ${isCorrect ? 'border-emerald-500' : 'border-rose-500'} flex flex-col gap-4 text-left`}>
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="font-extrabold text-slate-400">Question {idx + 1}</span>
-                      <Badge variant={isCorrect ? 'success' : 'danger'}>
-                        {isCorrect ? 'Correct' : userAns.length === 0 ? 'Skipped' : 'Wrong'}
-                      </Badge>
-                    </div>
-
-                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{q.question}</p>
-
-                    <div className="flex flex-col gap-2.5 text-xs text-slate-500">
-                      <div>
-                        <span className="font-extrabold text-slate-800 dark:text-slate-200">Your Answer:</span>
-                        <p className={`p-2 rounded-lg mt-1 ${isCorrect ? 'bg-emerald-500/5 text-emerald-600 font-bold' : 'bg-rose-500/5 text-rose-500'}`}>
-                          {userAns.join(', ') || '(No Answer Submitted)'}
-                        </p>
-                      </div>
-                      
-                      {!isCorrect && (
-                        <div>
-                          <span className="font-extrabold text-slate-800 dark:text-slate-200">Correct Answer:</span>
-                          <p className="p-2 bg-emerald-500/5 text-emerald-600 rounded-lg font-bold mt-1">
-                            {q.correct_answer.join(', ')}
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-850 mt-1">
-                        <span className="font-extrabold text-slate-800 dark:text-slate-200 block mb-1">Tutor Explanation & Accounting Guidelines:</span>
-                        <p className="italic leading-relaxed">{q.explanation}</p>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              });
-            })()}
-          </div>
         </motion.div>
       )}
     </div>
