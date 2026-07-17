@@ -267,7 +267,7 @@ export default function StudentPracticeQuizPage() {
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
 
-        router.push(`/dashboard/history/analysis?quizId=${savedAttempt.quizId}&attemptId=${savedAttempt._id}`);
+        router.push(`/dashboard/history/analysis?quizId=${savedAttempt.quizId}&attemptId=${savedAttempt.id}`);
         
         const updatedCurrentUser = {
           ...store.currentUser,
