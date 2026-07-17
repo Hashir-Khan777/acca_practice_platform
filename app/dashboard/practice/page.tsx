@@ -21,7 +21,7 @@ export default function StudentPracticeQuizPage() {
   const [quizSubject, setQuizSubject] = React.useState('');
   const [quizTopic, setQuizTopic] = React.useState('');
   const [quizDifficulty, setQuizDifficulty] = React.useState<'easy' | 'medium' | 'hard'>('medium');
-  const [quizQuestionsCount, setQuizQuestionsCount] = React.useState(3);
+  const [quizQuestionsCount, setQuizQuestionsCount] = React.useState(10);
   const [quizQuestionType, setQuizQuestionType] = React.useState<'MCQ' | 'Input' | 'Excel'>('MCQ');
   const [quizTimerOption, setQuizTimerOption] = React.useState('yes');
   const [isGenerating, setIsGenerating] = React.useState(false);
@@ -47,7 +47,7 @@ export default function StudentPracticeQuizPage() {
         if (topicMatch) {
           const subjectMatch = store.subjects.find((s: any) => s.id === topicMatch.subjectId);
           if (subjectMatch) {
-            setQuizSubject(subjectMatch.name);
+            setQuizSubject(subjectMatch.code);
             setQuizTopic(topicMatch.name);
             return;
           }
@@ -56,7 +56,7 @@ export default function StudentPracticeQuizPage() {
 
       // Default fallback select values
       if (store.subjects.length > 0) {
-        setQuizSubject(store.subjects[0].name);
+        setQuizSubject(store.subjects[0].code);
         const subTopics = store.topics.filter((t: any) => t.subjectId === store.subjects[0].id);
         if (subTopics.length > 0) {
           setQuizTopic(subTopics[0].name);
@@ -87,9 +87,9 @@ export default function StudentPracticeQuizPage() {
 
   if (!store) return null;
 
-  const updateSubjectSelector = (subjectName: string) => {
-    setQuizSubject(subjectName);
-    const selectedSub = store.subjects.find((s: any) => s.name === subjectName);
+  const updateSubjectSelector = (subjectCode: string) => {
+    setQuizSubject(subjectCode);
+    const selectedSub = store.subjects.find((s: any) => s.code === subjectCode);
     if (selectedSub) {
       const filtered = store.topics.filter((t: any) => t.subjectId === selectedSub.id);
       if (filtered.length > 0) {
@@ -150,9 +150,9 @@ export default function StudentPracticeQuizPage() {
       setGenProgress(100);
       setGenMessage('Quiz successfully synchronized!');
 
-      setTimeout(() => {
+      if (result.data.quizId) {
         const newQuiz: Quiz = {
-          id: 'quiz-' + Date.now(),
+          id: result.data.quizId,
           title: `Syllabus Test: ${quizTopic}`,
           subject: quizSubject,
           topic: quizTopic,
@@ -168,7 +168,7 @@ export default function StudentPracticeQuizPage() {
         setGenMessage('');
         
         startPracticeSession(newQuiz);
-      }, 500);
+      }
 
     } catch (err: any) {
       clearInterval(progressInterval);
@@ -267,7 +267,7 @@ export default function StudentPracticeQuizPage() {
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
 
-        router.push(`/dashboard/history/analysis?attemptId=${savedAttempt.id}`);
+        router.push(`/dashboard/history/analysis?quizId=${savedAttempt.quizId}&attemptId=${savedAttempt._id}`);
         
         const updatedCurrentUser = {
           ...store.currentUser,
@@ -338,25 +338,25 @@ export default function StudentPracticeQuizPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="ACCA Course Subject"
-                options={store.subjects.map((s: any) => ({ value: s.name, label: `${s.code} - ${s.name}` }))}
+                options={store.subjects.map((s: any) => ({ value: s.code, label: `${s.code} - ${s.name}` }))}
                 value={quizSubject}
                 onChange={(e) => updateSubjectSelector(e.target.value)}
               />
 
               <Select
                 label="Exam Syllabus Topic"
-                options={store.topics
+                options={[{ value: 'all', label: 'All' }, ...store.topics
                   .filter((t: any) => {
-                    const matchedSub = store.subjects.find((s: any) => s.name === quizSubject);
+                    const matchedSub = store.subjects.find((s: any) => s.code === quizSubject);
                     return matchedSub ? t.subjectId === matchedSub.id : true;
                   })
-                  .map((t: any) => ({ value: t.name, label: t.name }))}
+                  .map((t: any) => ({ value: t.name, label: t.name }))]}
                 value={quizTopic}
                 onChange={(e) => setQuizTopic(e.target.value)}
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="Difficulty Level"
                 options={[
@@ -368,7 +368,7 @@ export default function StudentPracticeQuizPage() {
                 onChange={(e: any) => setQuizDifficulty(e.target.value)}
               />
 
-              <Select
+              {/* <Select
                 label="Answering Format"
                 options={[
                   { value: 'MCQ', label: 'MCQ (Multiple Choice)' },
@@ -377,14 +377,17 @@ export default function StudentPracticeQuizPage() {
                 ]}
                 value={quizQuestionType}
                 onChange={(e: any) => setQuizQuestionType(e.target.value)}
-              />
+              /> */}
 
               <Select
                 label="Number of Questions"
                 options={[
-                  { value: '3', label: '3 Questions (Quick Practice)' },
-                  { value: '5', label: '5 Questions (Standard Review)' },
-                  { value: '10', label: '10 Questions (Mock Exam)' }
+                  { value: '10', label: '10 Questions (Warm-up)' },
+                  { value: '20', label: '20 Questions (Daily Routine)' },
+                  { value: '30', label: '30 Questions (Strengthen Mode)' },
+                  { value: '40', label: '40 Questions (Challenge Mode)' },
+                  { value: '50', label: '50 Questions (Mini Mock Exam)' },
+                  { value: '100', label: '100 Questions (Grand Mock Exam)' }
                 ]}
                 value={quizQuestionsCount.toString()}
                 onChange={(e) => setQuizQuestionsCount(parseInt(e.target.value))}

@@ -92,7 +92,7 @@ export default function StudentQuizHistoryPage() {
                       variant="ghost"
                       size="sm"
                       className="text-emerald-500 h-[28px] py-0 font-extrabold"
-                      onClick={() => router.push(`/dashboard/history/analysis?attemptId=${att.id}`)}
+                      onClick={() => router.push(`/dashboard/history/analysis?quizId=${att.quizId}&attemptId=${att.id}`)}
                     >
                       View Analysis
                     </Button>

@@ -117,12 +117,31 @@ export async function GET(req: NextRequest) {
 
     const populatedAttempts = [];
     for (const attempt of attempts) {
-      let questions: any[] = [];
-      if (attempt.quizId) {
+      let questions: any[] = attempt.questions && attempt.questions.length > 0 ? attempt.questions : [];
+      if (questions.length === 0 && attempt.quizId) {
         try {
           const quiz = await Quiz.findById(attempt.quizId);
           if (quiz) {
-            questions = quiz.questions;
+            const attemptAnswers = attempt.answers || new Map();
+            questions = quiz.questions.map((q: any) => {
+              let userAns = [];
+              if (attemptAnswers.get) {
+                userAns = attemptAnswers.get(q.id.toString()) || attemptAnswers.get(q.id) || [];
+              } else {
+                userAns = (attemptAnswers as any)[q.id.toString()] || (attemptAnswers as any)[q.id] || [];
+              }
+              const isCorrectQ = q.correct_answer.every((ans: string) => userAns.includes(ans)) && userAns.length === q.correct_answer.length;
+              return {
+                id: q.id,
+                question: q.question,
+                options: q.options,
+                correct_answer: q.correct_answer,
+                user_answer: userAns,
+                is_correct: isCorrectQ,
+                explanation: q.explanation,
+                type: q.type || 'single'
+              };
+            });
           }
         } catch (e) {}
       }

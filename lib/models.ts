@@ -89,7 +89,7 @@ export interface IQuestion {
   options: string[];
   correct_answer: string[];
   explanation: string;
-  type: 'single' | 'multiple' | 'input' | 'excel';
+  type: 'MCQ' | 'Input' | 'Excel';
 }
 
 export interface IQuiz extends Document {
@@ -109,7 +109,7 @@ const QuestionSchema = new Schema<IQuestion>({
   options: [{ type: String }],
   correct_answer: [{ type: String, required: true }],
   explanation: { type: String, required: true },
-  type: { type: String, enum: ['single', 'multiple', 'input', 'excel'], default: 'single' }
+  type: { type: String, enum: ['MCQ', 'Input', 'Excel'], default: 'single' }
 });
 
 const QuizSchema = new Schema<IQuiz>({
