@@ -114,7 +114,6 @@ export default function StudentQuizAnalysisPage() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-4xl text-left">
-      {console.log(latestAttempt, 'latestAttempt')}
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
