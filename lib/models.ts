@@ -109,7 +109,7 @@ const QuestionSchema = new Schema<IQuestion>({
   options: [{ type: String }],
   correct_answer: [{ type: String, required: true }],
   explanation: { type: String, required: true },
-  type: { type: String, enum: ['MCQ', 'Input', 'Excel'], default: 'single' }
+  type: { type: String, enum: ['MCQ', 'Input', 'Excel'] }
 });
 
 const QuizSchema = new Schema<IQuiz>({
