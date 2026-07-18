@@ -166,7 +166,7 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Input
                         label="Full Name"
-                        placeholder="e.g. Hashir Khan"
+                        placeholder="e.g. Jhon Doe"
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         error={errors.name}
@@ -174,7 +174,7 @@ export default function ContactPage() {
                       <Input
                         label="Study Email Address"
                         type="email"
-                        placeholder="e.g. hashirkhan@gmail.com"
+                        placeholder="e.g. example@gmail.com"
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                         error={errors.email}

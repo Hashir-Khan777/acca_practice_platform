@@ -52,7 +52,7 @@ export default function HomePage() {
     },
     {
       number: '02',
-      title: 'Gemini Engine Invocation',
+      title: 'ACCA AI Engine Invocation',
       description: 'Our fine-tuned AI prompts process the parameters to generate authentic, challenging exam-style JSON questions.',
     },
     {
@@ -80,7 +80,7 @@ export default function HomePage() {
   const faqs = [
     {
       q: "Does this platform use the official ACCA syllabus?",
-      a: "Yes. Our custom Google Gemini AI models are explicitly guided by the official, current ACCA syllabus, covering all primary accounting standards (IAS/IFRS), auditing guidelines (ISAs), and corporate regulations."
+      a: "Yes. Our custom ACCA AI models are explicitly guided by the official, current ACCA syllabus, covering all primary accounting standards (IAS/IFRS), auditing guidelines (ISAs), and corporate regulations."
     },
     {
       q: "Are the AI-generated questions unique?",
@@ -106,7 +106,7 @@ export default function HomePage() {
             </Badge>
             
             <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
-              Master Your ACCA Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Gemini AI</span>
+              Master Your ACCA Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">ACCA AI</span>
             </h1>
             
             <p className="text-lg text-slate-600 dark:text-slate-400 font-normal leading-relaxed max-w-xl">

@@ -105,7 +105,7 @@ export default function RegisterPage() {
                 <form onSubmit={handleRegister} className="flex flex-col gap-4">
                   <Input
                     label="Full Name"
-                    placeholder="e.g. Hashir Khan"
+                    placeholder="e.g. Jhon Doe"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
@@ -114,7 +114,7 @@ export default function RegisterPage() {
                   <Input
                     label="Active Email Address"
                     type="email"
-                    placeholder="e.g. hashir@gmail.com"
+                    placeholder="e.g. example@gmail.com"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required

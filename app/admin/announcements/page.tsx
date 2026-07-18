@@ -61,7 +61,7 @@ export default function AdminAnnouncementsPage() {
           
           <Input
             label="Bulletin Title"
-            placeholder="e.g. Gemini 3.5 Upgrade Completed"
+            placeholder="e.g. Product 3.5 Upgrade Completed"
             value={annTitle}
             onChange={(e) => setAnnTitle(e.target.value)}
             required

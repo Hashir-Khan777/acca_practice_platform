@@ -115,7 +115,7 @@ export default function StudentPracticeQuizPage() {
 
     setIsGenerating(true);
     setGenProgress(10);
-    setGenMessage('Connecting to Google Gemini API servers...');
+    setGenMessage('Connecting to ACCA AI servers...');
 
     const progressInterval = setInterval(() => {
       setGenProgress(prev => {
@@ -333,7 +333,7 @@ export default function StudentPracticeQuizPage() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-2xl">
           <div className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-900 pb-4">
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">AI Practice Generator</h2>
-            <p className="text-xs text-slate-500">Configure quiz constraints to invoke Gemini and construct challenging test question arrays.</p>
+            <p className="text-xs text-slate-500">Configure quiz constraints to invoke AI and construct challenging test question arrays.</p>
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); handleGenerateQuiz(); }} className="flex flex-col gap-5">
@@ -411,7 +411,7 @@ export default function StudentPracticeQuizPage() {
                 <Sparkles className="w-5 h-5 mr-2" /> Generate Unlimited AI Quiz Now
               </Button>
               <p className="text-[11px] text-center text-slate-400 font-mono">
-                Calls Google Gemini 3.5 Flash server-side. Output is automatically validated against structural schemas.
+                Calls AI server-side. Output is automatically validated against structural schemas.
               </p>
             </div>
           </form>

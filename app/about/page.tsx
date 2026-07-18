@@ -93,7 +93,7 @@ export default function AboutPage() {
       </section>
 
       {/* Platform Roadmap */}
-      <section id="roadmap" className="py-16 px-4 bg-slate-50 dark:bg-slate-900 border-t border-b border-slate-100 dark:border-slate-800">
+      {/* <section id="roadmap" className="py-16 px-4 bg-slate-50 dark:bg-slate-900 border-t border-b border-slate-100 dark:border-slate-800">
         <div className="max-w-5xl mx-auto flex flex-col gap-12">
           <div className="text-center flex flex-col gap-3">
             <Badge variant="warning" className="mx-auto">SaaS Roadmap</Badge>
@@ -118,7 +118,7 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Meet the Team */}
       <section id="team" className="py-16 px-4 bg-white dark:bg-slate-950">

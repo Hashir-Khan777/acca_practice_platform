@@ -1,12 +1,16 @@
-import type { Metadata } from 'next';
-import './globals.css'; // Global styles
+import type { Metadata } from "next";
+import "./globals.css"; // Global styles
 
 export const metadata: Metadata = {
-  title: 'ACCA AI Practice Platform',
-  description: 'Practice ACCA syllabus and generate mock exams with Google Gemini AI.',
+  title: "ACCA AI Practice Platform",
+  description: "Practice ACCA syllabus and generate mock exams with ACCA AI.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <head>
@@ -27,7 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body suppressHydrationWarning className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+      <body
+        suppressHydrationWarning
+        className="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased"
+      >
         {children}
       </body>
     </html>

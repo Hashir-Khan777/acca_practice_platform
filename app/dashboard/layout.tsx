@@ -87,11 +87,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         // Build notifications
-        const initialNotes = [
-          { id: 'n-1', title: 'Welcome to ACCA AI!', desc: 'Create your first practice quiz with Google Gemini to start your daily streak.', date: 'Just now', read: false },
-          { id: 'n-2', title: 'Milestone Alert', desc: 'Achieve a 7-day streak to unlock the "Topic Master" badge.', date: '1 hour ago', read: false }
-        ];
-        setNotifications(initialNotes);
+        // const initialNotes = [
+        //   { id: 'n-1', title: 'Welcome to ACCA AI!', desc: 'Create your first practice quiz with Google Gemini to start your daily streak.', date: 'Just now', read: false },
+        //   { id: 'n-2', title: 'Milestone Alert', desc: 'Achieve a 7-day streak to unlock the "Topic Master" badge.', date: '1 hour ago', read: false }
+        // ];
+        // setNotifications(initialNotes);
 
       } catch (err) {
         console.error('Failed to initialize student dashboard portal:', err);
@@ -348,7 +348,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Dialog isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} title="Upgrade to Full-Pass Premium">
           <div className="flex flex-col gap-5 text-left py-2">
             <p className="text-xs text-slate-500 leading-relaxed">
-              Gain unlimited access to fine-tuned Google Gemini 3.5 AI question generations, smart topic weakness tracking metrics, and detailed report scorecard downloads.
+              Gain unlimited access to fine-tuned ACCA AI question generations, smart topic weakness tracking metrics, and detailed report scorecard downloads.
             </p>
             <div className="p-4 bg-slate-900 text-white rounded-2xl flex justify-between items-center">
               <div className="flex flex-col gap-0.5 text-left">

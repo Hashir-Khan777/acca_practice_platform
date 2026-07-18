@@ -16,7 +16,7 @@ export default function FeaturesPage() {
     {
       badge: 'AI ENGINE',
       title: 'Adaptive Quiz Generator',
-      description: 'Never practice with the exact same stale questions again. Our custom Google Gemini AI prompt models ingest your exact Subject and Topic to craft authentic, highly challenging case scenarios on-the-fly.',
+      description: 'Never practice with the exact same stale questions again. Our custom ACCA AI models ingest your exact Subject and Topic to craft authentic, highly challenging case scenarios on-the-fly.',
       bullets: [
         'Select MCQ, Input, or standard Excel types.',
         'Choose Easy, Medium, or Hard difficulty levels.',
@@ -115,7 +115,7 @@ export default function FeaturesPage() {
                   <hr className="border-slate-50 dark:border-slate-850" />
                   <div className="flex flex-col gap-2 font-mono text-[11px] text-slate-400">
                     <p>SYSTEM_CORE_INIT: OK</p>
-                    <p>GEMINI_3_5_API_HANDSHAKE: ACTIVE</p>
+                    <p>ACCA_API_HANDSHAKE: ACTIVE</p>
                     <p>ACC_SYLLABUS_MAPPING: SUCCESS (100%)</p>
                   </div>
                 </Card>

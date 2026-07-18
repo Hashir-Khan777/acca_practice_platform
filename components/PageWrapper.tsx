@@ -318,7 +318,7 @@ export default function PageWrapper({
                   <span className="font-bold text-base text-slate-900 dark:text-white">ACCA AI Practice</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  The ultimate SaaS simulation practice engine for ACCA Knowledge, Applied Skills, and Strategic Professional levels. Driven by custom fine-tuned Google Gemini 3.5 AI models.
+                  The ultimate SaaS simulation practice engine for ACCA Foundation, Applied Skills, and Strategic Professional levels. Driven by custom fine-tuned ACCA AI models.
                 </p>
                 <div className="flex items-center gap-3 text-xs text-slate-400 mt-2">
                   <Shield className="w-4 h-4 text-emerald-500" />
@@ -376,10 +376,6 @@ export default function PageWrapper({
               <p className="text-[11px] text-slate-400 font-mono">
                 © 2026 ACCA Practice Platform. Built for premium digital exam preps.
               </p>
-              <div className="flex gap-4 text-[11px] text-slate-400 font-mono">
-                <span>Enterprise SLA 99.99%</span>
-                <span>Powered by Gemini 3.5 AI</span>
-              </div>
             </div>
           </footer>
         </>
