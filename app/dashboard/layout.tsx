@@ -163,7 +163,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setShowUpgradeModal,
       }}
     >
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col text-slate-800 dark:text-slate-100 transition-colors duration-300">
+      <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex flex-col text-slate-800 dark:text-slate-100 transition-colors duration-300">
         
         {/* HEADER BAR */}
         <header className="h-16 border-b border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950/85 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6">
@@ -221,7 +221,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* CORE FRAMEWORK */}
-        <div className="flex-grow flex relative">
+        <div className="flex-grow flex relative overflow-hidden">
           
           {/* DESKTOP SIDEBAR */}
           <aside className="w-64 border-r border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950 hidden md:flex flex-col justify-between py-6 px-4">
