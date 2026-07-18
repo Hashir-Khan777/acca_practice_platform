@@ -4,6 +4,9 @@ import * as React from 'react';
 import PageWrapper from '@/components/PageWrapper';
 import { Badge, Card } from '@/components/UI';
 import { Target, Eye, Compass, Heart, Award, ArrowRight } from 'lucide-react';
+import Image from "next/image";
+import Hashir from '@/images/hashir.jpeg'
+import Ahsan from '@/images/ahsan.jpeg'
 
 export default function AboutPage() {
   const values = [
@@ -128,21 +131,21 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-3xl mx-auto w-full">
             <Card className="p-6 text-center flex flex-col items-center gap-4" hoverable>
-              <img src="https://picsum.photos/seed/ceo/150/150" alt="Founder 1" className="w-20 h-20 rounded-full object-cover border border-slate-100 shadow-sm" />
+              <Image src={Hashir} alt="Founder 1" className="w-20 h-20 rounded-full object-cover border border-slate-100 shadow-sm" />
               <div className="flex flex-col">
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">James Sterling, FCCA</h4>
-                <span className="text-xs text-slate-500">Co-Founder & Chief Accounting Officer</span>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Muhammad Hashir, ACCA Student</h4>
+                {/* <span className="text-xs text-slate-500">Founder & Chief Executive Officer</span> */}
               </div>
-              <p className="text-xs text-slate-500 max-w-xs leading-relaxed">Ex-Big 4 Auditor with 12+ years of teaching FR and AAA levels at premier business schools.</p>
+              {/* <p className="text-xs text-slate-500 max-w-xs leading-relaxed">Ex-Big 4 Auditor with 12+ years of teaching FR and AAA levels at premier business schools.</p> */}
             </Card>
 
             <Card className="p-6 text-center flex flex-col items-center gap-4" hoverable>
-              <img src="https://picsum.photos/seed/cto/150/150" alt="Founder 2" className="w-20 h-20 rounded-full object-cover border border-slate-100 shadow-sm" />
+              <Image src={Ahsan} alt="Founder 2" className="w-20 h-20 rounded-full object-cover border border-slate-100 shadow-sm" />
               <div className="flex flex-col">
-                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Aiden Vance</h4>
-                <span className="text-xs text-slate-500">Co-Founder & Lead AI Architect</span>
+                <h4 className="font-bold text-sm text-slate-900 dark:text-white">Muhammad Ahsan, ICAP student</h4>
+                {/* <span className="text-xs text-slate-500">Co-Founder & Chief Marketing Officer</span> */}
               </div>
-              <p className="text-xs text-slate-500 max-w-xs leading-relaxed">SaaS engineer specialized in fine-tuning prompts, persistent databases, and educational models.</p>
+              {/* <p className="text-xs text-slate-500 max-w-xs leading-relaxed">SaaS engineer specialized in fine-tuning prompts, persistent databases, and educational models.</p> */}
             </Card>
           </div>
         </div>

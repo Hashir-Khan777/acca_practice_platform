@@ -7,6 +7,8 @@ import { useDashboard } from '../../context';
 import { Card, Button, Badge } from '@/components/UI';
 import { CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Question } from '@/lib/store';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function StudentQuizAnalysisPage() {
   const router = useRouter();
@@ -194,7 +196,7 @@ export default function StudentQuizAnalysisPage() {
           
           return fallbackQs.map((q: Question, idx: number) => {
             const userAns = latestAttempt.answers[q.id] || [];
-            const isCorrect = q.correct_answer.every((ans: string) => userAns.includes(ans)) && userAns.length === q.correct_answer.length;
+            const isCorrect = q.correct_answer.every((ans: string) => userAns.includes(ans));
             
             return (
               <Card key={idx} className={`p-6 border-l-4 ${
@@ -209,42 +211,50 @@ export default function StudentQuizAnalysisPage() {
                   </Badge>
                 </div>
 
-                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">{q.question}</p>
+                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 leading-relaxed">
+                  <Markdown remarkPlugins={[remarkGfm]}>{q.question}</Markdown>
+                </p>
 
-                <div className="flex flex-col gap-2.5 mt-1">
-                  {q.options && q.options.map((opt: string, oIdx: number) => {
-                    const isSelected = userAns.includes(opt);
-                    const isCorrectOpt = q.correct_answer.includes(opt);
-                    
-                    let optClass = "border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 text-slate-700 dark:text-slate-355";
-                    
-                    if (isSelected && isCorrectOpt) {
-                      optClass = "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold";
-                    } else if (isSelected && !isCorrectOpt) {
-                      optClass = "border-rose-500/30 bg-rose-500/10 text-rose-500 dark:text-rose-450 font-semibold";
-                    } else if (!isSelected && isCorrectOpt) {
-                      optClass = "border-emerald-500/30 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-medium";
-                    }
+                {q.options && q.options.length > 0 ?
+                  <div className="flex flex-col gap-2.5 mt-1">
+                    {q.options && q.options.map((opt: string, oIdx: number) => {
+                      const isSelected = userAns.includes(opt);
+                      const isCorrectOpt = q.correct_answer.includes(opt);
+                      
+                      let optClass = "border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/10 text-slate-700 dark:text-slate-355";
+                      
+                      if (isSelected && isCorrectOpt) {
+                        optClass = "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold";
+                      } else if (isSelected && !isCorrectOpt) {
+                        optClass = "border-rose-500/30 bg-rose-500/10 text-rose-500 dark:text-rose-450 font-semibold";
+                      } else if (!isSelected && isCorrectOpt) {
+                        optClass = "border-emerald-500/30 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-medium";
+                      }
 
-                    return (
-                      <div key={oIdx} className={`p-3 rounded-xl border text-xs flex justify-between items-center transition-all ${optClass}`}>
-                        <span>{opt}</span>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          {isSelected && (
-                            <Badge variant={isCorrectOpt ? "success" : "danger"} className="text-[8px] uppercase tracking-wider px-2 py-0.5 scale-90">
-                              Your Choice
-                            </Badge>
-                          )}
-                          {isCorrectOpt && (
-                            <Badge variant="success" className="text-[8px] uppercase tracking-wider px-2 py-0.5 scale-90">
-                              Correct Answer
-                            </Badge>
-                          )}
+                      return (
+                        <div key={oIdx} className={`p-3 rounded-xl border text-xs flex justify-between items-center transition-all ${optClass}`}>
+                          <span>{opt}</span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {isSelected && (
+                              <Badge variant={isCorrectOpt ? "success" : "danger"} className="text-[8px] uppercase tracking-wider px-2 py-0.5 scale-90">
+                                Your Choice
+                              </Badge>
+                            )}
+                            {isCorrectOpt && (
+                              <Badge variant="success" className="text-[8px] uppercase tracking-wider px-2 py-0.5 scale-90">
+                                Correct Answer
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                : <div className="flex flex-col gap-2.5 mt-1">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-md">Correct Answer: {q.correct_answer}</span>
+                    <span className="text-rose-500 dark:text-rose-450 font-semibold text-md">Your Answer: {userAns}</span>
+                  </div>
+                }
 
                 <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100/80 dark:border-slate-850 mt-1">
                   <span className="font-extrabold text-slate-800 dark:text-slate-200 text-xs block mb-1">Tutor Explanation & ACCA Standard:</span>

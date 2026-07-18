@@ -144,9 +144,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { id: 'achievements', name: 'Achievements', path: '/dashboard/achievements', icon: <Award className="w-4 h-4" /> },
     { id: 'notifications', name: 'Announcements', path: '/dashboard/notifications', icon: <Bell className="w-4 h-4" /> },
     { id: 'profile', name: 'Student Profile', path: '/dashboard/profile', icon: <UserIcon className="w-4 h-4" /> },
-    { id: 'subscription', name: 'Subscription', path: '/dashboard/subscription', icon: <Shield className="w-4 h-4" /> },
     { id: 'help', name: 'Help Center', path: '/dashboard/help', icon: <HelpCircle className="w-4 h-4" /> },
-    { id: 'settings', name: 'SaaS Settings', path: '/dashboard/settings', icon: <Settings className="w-4 h-4" /> },
+    // { id: 'subscription', name: 'Subscription', path: '/dashboard/subscription', icon: <Shield className="w-4 h-4" /> },
+    // { id: 'settings', name: 'SaaS Settings', path: '/dashboard/settings', icon: <Settings className="w-4 h-4" /> },
   ];
 
   return (
@@ -253,7 +253,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="flex flex-col gap-3 px-2">
-              {store.currentUser.plan === 'free' && (
+              {/* {store.currentUser.plan === 'free' && (
                 <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20 rounded-2xl flex flex-col gap-2">
                   <span className="text-[10px] uppercase font-mono tracking-wider text-purple-600 dark:text-purple-400 font-extrabold flex items-center gap-1">
                     <Sparkles className="w-3 h-3" /> Upgrade Study Power
@@ -263,7 +263,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     Go Premium
                   </Button>
                 </Card>
-              )}
+              )} */}
               <Button variant="ghost" size="sm" className="w-full text-slate-500" onClick={handleLogout}>
                 Logout Profile
               </Button>

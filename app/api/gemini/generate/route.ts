@@ -96,16 +96,6 @@ Do not reproduce or paraphrase copyrighted content. Create new, original questio
 OBJECTIVE
 ==================================================
 
-Generate EXACTLY ${numQuestions || 10} questions.
-
-Distribution
-
-- Multiple Choice Questions (50%)
-- Input Questions (30%)
-- Excel Questions (20%)
-
-Requirements
-
 - Generate exactly ${numQuestions || 10} JSON objects.
 - Never generate fewer or more.
 - Do not stop until all ${numQuestions || 10} questions are produced.
@@ -136,7 +126,7 @@ QUESTION QUALITY STANDARDS
 
 Every question must:
 
-- Match the style of official ACCA Foundation ${subject} examinations and topic must be ${topic}.
+- Match the exact style of official ACCA Foundation ${subject} examinations for the topic:${topic}.
 - Use professional ${difficulty} level British English.
 - Be ${difficulty} difficulty.
 - Test conceptual understanding where appropriate.
@@ -167,17 +157,24 @@ Input Questions
 
 Excel Questions
 
-Include realistic spreadsheet content inside the question.
+- Include realistic spreadsheet content inside the question.
+- The spreadsheet should resemble Microsoft Excel using a text table.
+- Each Excel question must also include a text-based chart.
+- The chart must contain meaningful data that requires interpretation.
+- The candidate should analyse the spreadsheet and chart before answering.
+- Do not create Excel questions that only ask the candidate to read a value directly.
+- Follow the strict JSON escaping guidelines below.
 
-The spreadsheet should resemble Microsoft Excel using a text table.
+==================================================
+STRICT EXCEL JSON ESCAPING RULES (CRITICAL FOR API PARSING)
+==================================================
 
-Each Excel question must also include a text-based chart.
+For any question with "type": "Excel", you must embed a structured text layout inside the "question" string. To prevent JSON parsing crashes on the web frontend, you MUST follow these formatting rules inside the JSON string:
 
-The chart must contain meaningful data that requires interpretation.
-
-The candidate should analyse the spreadsheet and chart before answering.
-
-Do not create Excel questions that only ask the candidate to read a value directly.
+1. Line Breaks: Use literal "\n\n" to separate text, tables, and charts. Do not insert actual unescaped newlines inside the JSON value.
+2. Table Syntax: Use clean Markdown pipe syntax. Keep data compact (maximum 4 rows and 4 columns) to fit web and mobile screens.
+3. Chart Syntax: Embed the ASCII chart using standard markdown code block formatting with clean text characters (like '#' or '█').
+4. Pipe Escaping: Inside a JSON string, all markdown pipe symbols used for tables or charts must be safely written without causing string termination issues.
 
 ==================================================
 QUESTION TYPE VALUES
@@ -315,41 +312,6 @@ QUESTION DISTRIBUTION
 Mix the question types naturally throughout the output.
 
 Do not group all questions of one type together.
-
-==================================================
-EXCEL CONTENT REQUIREMENTS
-==================================================
-
-Every Excel question must include
-
-1. Spreadsheet table
-
-Example
-
-Month | Sales | Costs
-Jan   | 12000 | 8000
-Feb   | 14000 | 9000
-Mar   | 16000 | 9500
-
-2. Text-based chart
-
-Example
-
-Sales
-
-Jan  ████████
-Feb  ██████████
-Mar  ████████████
-
-or
-
-Sales
-
-Jan | ########
-Feb | ##########
-Mar | ############
-
-The chart must require interpretation.
 
 ==================================================
 CONTENT REQUIREMENTS

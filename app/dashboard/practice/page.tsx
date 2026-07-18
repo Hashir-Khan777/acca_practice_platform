@@ -9,6 +9,8 @@ import {
   BookOpen, Clock, Sparkles, Bookmark, ChevronRight, Check
 } from 'lucide-react';
 import { Quiz } from '@/lib/store';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function StudentPracticeQuizPage() {
   const router = useRouter();
@@ -467,37 +469,44 @@ export default function StudentPracticeQuizPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <span className="text-[10px] font-mono tracking-widest text-emerald-500 font-extrabold">ACCA EXAM SCENARIO:</span>
                 <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-relaxed whitespace-pre-line">
-                  {activeQuiz.questions[currentQuestionIdx].question}
+                  <Markdown remarkPlugins={[remarkGfm]}>{activeQuiz.questions[currentQuestionIdx].question}</Markdown>
                 </p>
               </div>
 
               <hr className="border-slate-100 dark:border-slate-800/60" />
 
-              <div className="flex flex-col gap-3">
-                {activeQuiz.questions[currentQuestionIdx].options.map((opt, oIdx) => {
-                  const isSelected = activeQuizAnswers[activeQuiz.questions[currentQuestionIdx].id]?.includes(opt);
-                  return (
-                    <div
-                      key={oIdx}
-                      onClick={() => handleAnswerSelect(activeQuiz.questions[currentQuestionIdx].id, opt)}
-                      className={`p-4 border rounded-2xl flex items-start gap-3 cursor-pointer transition-all ${
-                        isSelected
-                          ? 'bg-emerald-500/10 border-emerald-500/40 text-slate-950 dark:text-white'
-                          : 'border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900/40 text-slate-600 dark:text-slate-300'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
-                        isSelected ? 'border-emerald-500 text-emerald-500 bg-emerald-500/10' : 'border-slate-300'
-                      }`}>
-                        {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+              {activeQuiz.questions[currentQuestionIdx].options.length > 0 ?
+                <div className="flex flex-col gap-3">
+                  {activeQuiz.questions[currentQuestionIdx].options.map((opt, oIdx) => {
+                    const isSelected = activeQuizAnswers[activeQuiz.questions[currentQuestionIdx].id]?.includes(opt);
+                    return (
+                      <div
+                        key={oIdx}
+                        onClick={() => handleAnswerSelect(activeQuiz.questions[currentQuestionIdx].id, opt)}
+                        className={`p-4 border rounded-2xl flex items-start gap-3 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-emerald-500/10 border-emerald-500/40 text-slate-950 dark:text-white'
+                            : 'border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900/40 text-slate-600 dark:text-slate-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-0.5 ${
+                          isSelected ? 'border-emerald-500 text-emerald-500 bg-emerald-500/10' : 'border-slate-300'
+                        }`}>
+                          {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />}
+                        </div>
+                        <span className="text-xs font-semibold">{opt}</span>
                       </div>
-                      <span className="text-xs font-semibold">{opt}</span>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              : <Input
+                  label="Type your answer here..."
+                  type="default"
+                  value={activeQuizAnswers[activeQuiz.questions[currentQuestionIdx].id]}
+                  onChange={(e: any) => handleAnswerSelect(activeQuiz.questions[currentQuestionIdx].id, e.target.value.toString())}
+                  required
+                />}
 
               <div className="flex justify-between items-center mt-4">
                 <Button

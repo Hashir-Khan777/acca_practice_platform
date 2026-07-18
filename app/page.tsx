@@ -312,7 +312,7 @@ export default function HomePage() {
         </div>
       </section>
       {/* PRICING SECTION */}
-      <section id="pricing" className="py-20 px-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+      {/* <section id="pricing" className="py-20 px-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
         <div className="max-w-7xl mx-auto flex flex-col gap-16 text-center">
           <div className="flex flex-col gap-4 max-w-2xl mx-auto">
             <Badge variant="premium" className="mx-auto">Subscription Plans</Badge>
@@ -325,7 +325,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8 w-full">
-            {/* Free Plan */}
+            // Free Plan
             <Card className="flex flex-col text-left justify-between p-8 bg-white border border-slate-100 rounded-3xl" hoverable>
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-center">
@@ -351,7 +351,7 @@ export default function HomePage() {
               </Button>
             </Card>
 
-            {/* Premium Plan */}
+            // Premium Plan
             <Card className="flex flex-col text-left justify-between p-8 bg-slate-950 border border-slate-800 text-white rounded-3xl relative overflow-hidden" hoverable>
               <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 blur-3xl rounded-full" />
               <div className="flex flex-col gap-4">
@@ -379,7 +379,7 @@ export default function HomePage() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* TESTIMONIALS */}
       <section className="py-20 px-4 bg-white dark:bg-slate-950">
