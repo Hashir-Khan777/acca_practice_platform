@@ -83,7 +83,7 @@ export default function StudentDashboardOverview() {
             Welcome back, {store.currentUser.name}!
           </h2>
           <p className="text-xs text-slate-500">
-            Track your streaks, solve new ACCA quizzes, and monitor your weakness detection matrices.
+            Track your streaks, solve new quizzes, and monitor your weakness detection matrices.
           </p>
         </div>
         

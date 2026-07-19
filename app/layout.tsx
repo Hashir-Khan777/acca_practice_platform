@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css"; // Global styles
 
 export const metadata: Metadata = {
-  title: "ACCA AI Practice Platform",
-  description: "Practice ACCA syllabus and generate mock exams with ACCA AI.",
+  title: "Accountly AI Practice Platform",
+  description:
+    "Practice CA, ACCA, ICMA, and professional syllabus concepts with Accountly AI.",
 };
 
 export default function RootLayout({

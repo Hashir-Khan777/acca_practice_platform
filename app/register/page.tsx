@@ -10,7 +10,7 @@ import { motion } from 'motion/react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = React.useState({ name: '', email: '', country: 'United Kingdom', accaLevel: 'Foundation Diploma (FA1, FA2, MA1, MA2)', password: '' });
+  const [form, setForm] = React.useState({ name: '', email: '', country: 'Pakistan', accaLevel: 'Foundation Diploma (FA1, FA2, MA1, MA2)', password: '' });
   const [error, setError] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -128,7 +128,7 @@ export default function RegisterPage() {
                   />
 
                   <Select
-                    label="ACCA Study Level"
+                    label="Study Level"
                     options={accaLevels}
                     value={form.accaLevel}
                     onChange={(e) => setForm({ ...form, accaLevel: e.target.value })}

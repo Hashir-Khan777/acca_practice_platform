@@ -1,6 +1,6 @@
 {
-  "name": "ACCA AI Practice Platform",
-  "description": "A premium SaaS platform for ACCA students to generate unlimited practice quizzes, track streaks, and receive smart study recommendations powered by Google Gemini AI.",
+  "name": "Accountly AI Practice Platform",
+  "description": "A premium SaaS platform for students to generate unlimited practice quizzes, track streaks, and receive smart study recommendations powered by Accountly AI.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

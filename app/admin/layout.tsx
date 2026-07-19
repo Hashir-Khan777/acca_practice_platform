@@ -166,7 +166,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Shield className="w-4 h-4" />
             </div>
             <span className="font-extrabold text-sm tracking-tight bg-gradient-to-r from-slate-950 to-slate-850 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-              ACCA Admin HQ
+              Accountly HQ
             </span>
             <span className="text-[10px] uppercase font-mono font-extrabold text-orange-500 px-2 py-0.5 bg-orange-500/10 rounded-md">
               SLA Control

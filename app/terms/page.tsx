@@ -25,7 +25,7 @@ export default function TermsPage() {
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2">1. Acceptance of Terms</h3>
               <p>
-                By registering an account on the ACCA AI Practice Platform (&ldquo;the SaaS Service&rdquo;), you confirm your complete acceptance of these Terms & Conditions. If you do not accept these terms, you are prohibited from utilizing any of the AI practice engines or dashboard metrics.
+                By registering an account on the Accountly AI Practice Platform (&ldquo;the SaaS Service&rdquo;), you confirm your complete acceptance of these Terms & Conditions. If you do not accept these terms, you are prohibited from utilizing any of the AI practice engines or dashboard metrics.
               </p>
             </div>
 
@@ -34,7 +34,7 @@ export default function TermsPage() {
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2">2. Description of SaaS Services</h3>
               <p>
-                We deliver an automated AI-driven practicing environment. The questions generated are simulations designed to test concepts within the ACCA syllabus. We do not issue formal ACCA certifications, nor are we officially endorsed by the Association of Chartered Certified Accountants. All final examinations are managed strictly by the official ACCA body.
+                We deliver an automated AI-driven practicing environment. The questions generated are simulations designed to test concepts within the Accountly AI curriculum. We do not issue formal certifications, nor are we officially endorsed by the Association of Chartered Certified Accountants. All final examinations are managed strictly by the official body.
               </p>
             </div>
 
@@ -61,7 +61,7 @@ export default function TermsPage() {
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2">5. SLA & Disclaimer of Warranties</h3>
               <p>
-                We do not warrant that all generated solutions are 100% error-free. AI-generated questions are provided &ldquo;as-is.&rdquo; While our tutors actively check the standard database structures, the student is responsible for verifying answers against official ACCA study material.
+                We do not warrant that all generated solutions are 100% error-free. AI-generated questions are provided &ldquo;as-is.&rdquo; While our tutors actively check the standard database structures, the student is responsible for verifying answers against official study materials.
               </p>
             </div>
 

@@ -11,7 +11,7 @@ import Ahsan from '@/images/ahsan.jpeg'
 export default function AboutPage() {
   const values = [
     { icon: <Target className="w-5 h-5 text-emerald-500" />, title: 'Excellence', text: 'We maintain the highest pedagogical standards in accounting guidelines.' },
-    { icon: <Eye className="w-5 h-5 text-amber-500" />, title: 'Syllabus Precision', text: 'Every generated item traces exactly to the actual ACCA syllabus objectives.' },
+    { icon: <Eye className="w-5 h-5 text-amber-500" />, title: 'Syllabus Precision', text: 'Every generated item traces exactly to the actual syllabus objectives.' },
     { icon: <Heart className="w-5 h-5 text-rose-500" />, title: 'Accessibility', text: 'Affordable, premium training accessible on mobile and desktop anytime.' },
     { icon: <Award className="w-5 h-5 text-blue-500" />, title: 'Innovation', text: 'Utilizing modern LLMs to craft realistic, unique testing environments.' },
   ];
@@ -34,7 +34,7 @@ export default function AboutPage() {
             Pioneering the Future of Professional Education
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            We are a team of certified Chartered Accountants, SaaS creators, and AI engineers committed to making world-class ACCA practice materials instantly accessible to anyone, anywhere.
+            We are a team of certified Chartered Accountants, SaaS creators, and AI engineers committed to making world-class practice materials instantly accessible to anyone, anywhere.
           </p>
         </div>
       </section>
@@ -44,13 +44,13 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="flex flex-col gap-6 text-left">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Why We Built ACCA AI
+              Why We Built Accountly AI
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Studying for ACCA can be incredibly taxing. Standard training centers charge thousands of dollars for fixed-size static textbooks and old mock PDF sets. If you fail, you receive little context as to where you went wrong, or what topics you failed to grasp.
+              Studying for the exam can be incredibly taxing. Standard training centers charge thousands of dollars for fixed-size static textbooks and old mock PDF sets. If you fail, you receive little context as to where you went wrong, or what topics you failed to grasp.
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              We realized that generative artificial intelligence can act as a personal, 24/7 tutor. By fine-tuning large language models on the exact ACCA curriculum, we can give students a customized practicing canvas that generates fresh, highly rigorous case scenarios, grades them instantly, and explains the concepts step-by-step.
+              We realized that generative artificial intelligence can act as a personal, 24/7 tutor. By fine-tuning large language models on the exact syllabus curriculum, we can give students a customized practicing canvas that generates fresh, highly rigorous case scenarios, grades them instantly, and explains the concepts step-by-step.
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export default function AboutPage() {
             <div className="flex flex-col gap-4 text-xs">
               <div>
                 <span className="font-extrabold text-slate-800 dark:text-slate-200">Our Mission:</span>
-                <p className="text-slate-500 mt-1">To accelerate and simplify the ACCA qualification path for 1 million students globally by delivering responsive, premium SaaS training tools.</p>
+                <p className="text-slate-500 mt-1">To accelerate and simplify the exam path for 1 million students globally by delivering responsive, premium SaaS training tools.</p>
               </div>
               <hr className="border-slate-100 dark:border-slate-800/80" />
               <div>

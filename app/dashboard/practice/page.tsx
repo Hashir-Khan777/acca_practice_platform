@@ -121,7 +121,7 @@ export default function StudentPracticeQuizPage() {
     }
 
     setIsGenerating(true);
-    setGenMessage('Connecting to ACCA AI servers...');
+    setGenMessage('Connecting to Accountly AI servers...');
 
     const progressInterval = setInterval(() => {
       setGenProgress(prev => {
@@ -458,7 +458,7 @@ export default function StudentPracticeQuizPage() {
           <form onSubmit={(e) => { e.preventDefault(); handleGenerateQuiz(); }} className="flex flex-col gap-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
-                label="ACCA Course Subject"
+                label="Course Subject"
                 options={store.subjects.map((s: any) => ({ value: s.code, label: `${s.code} - ${s.name}` }))}
                 value={quizSubject}
                 onChange={(e) => updateSubjectSelector(e.target.value)}

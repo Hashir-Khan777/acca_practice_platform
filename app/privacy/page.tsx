@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white mb-2">1. Data Collected</h3>
               <p>
-                We collect your name, study email address, country, and selected ACCA level during registration to customize your dashboard layout and recommendation algorithms. No sensitive banking details are held on our servers; all transaction invoices are routed securely through certified payment gateways.
+                We collect your name, study email address, country, and selected level during registration to customize your dashboard layout and recommendation algorithms. No sensitive banking details are held on our servers; all transaction invoices are routed securely through certified payment gateways.
               </p>
             </div>
 

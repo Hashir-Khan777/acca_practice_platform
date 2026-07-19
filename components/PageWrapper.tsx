@@ -61,7 +61,7 @@ export default function PageWrapper({
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-mono text-slate-500">Loading ACCA Platform...</p>
+          <p className="text-sm font-mono text-slate-500">Loading Accountly Platform...</p>
         </div>
       </div>
     );
@@ -124,7 +124,7 @@ export default function PageWrapper({
                 <BookOpen className="w-5 h-5" />
               </div>
               <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                ACCA <span className="text-emerald-500 font-extrabold font-mono text-sm uppercase px-1.5 py-0.5 rounded-md border border-emerald-500/20 bg-emerald-500/10">AI</span>
+                Accountly <span className="text-emerald-500 font-extrabold font-mono text-sm uppercase px-1.5 py-0.5 rounded-md border border-emerald-500/20 bg-emerald-500/10">AI</span>
               </span>
             </div>
 
@@ -269,7 +269,7 @@ export default function PageWrapper({
           <section className="bg-slate-100/50 dark:bg-slate-900/40 border-t border-slate-100 dark:border-slate-800/55 py-16 px-4">
             <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-6">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Accelerate Your ACCA Journey Today
+                Accelerate Your Journey Today
               </h2>
               <p className="text-slate-600 dark:text-slate-400 max-w-xl text-sm leading-relaxed">
                 Join thousands of students who pass exams on their first attempt with personalized AI generation, performance heatmaps, and streak boosters.
@@ -315,14 +315,14 @@ export default function PageWrapper({
                   <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg text-white">
                     <BookOpen className="w-4 h-4" />
                   </div>
-                  <span className="font-bold text-base text-slate-900 dark:text-white">ACCA AI Practice</span>
+                  <span className="font-bold text-base text-slate-900 dark:text-white">Accountly AI Practice</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  The ultimate SaaS simulation practice engine for ACCA Foundation, Applied Skills, and Strategic Professional levels. Driven by custom fine-tuned ACCA AI models.
+                  The ultimate SaaS simulation practice engine for all levels. Driven by custom fine-tuned Accountly AI models.
                 </p>
                 <div className="flex items-center gap-3 text-xs text-slate-400 mt-2">
                   <Shield className="w-4 h-4 text-emerald-500" />
-                  <span>Licensed ACCA Content Guidelines compliant.</span>
+                  <span>Licensed Accountly AI Content Guidelines compliant.</span>
                 </div>
               </div>
 
@@ -374,7 +374,7 @@ export default function PageWrapper({
 
             <div className="max-w-7xl mx-auto border-t border-slate-100 dark:border-slate-900/60 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-[11px] text-slate-400 font-mono">
-                © 2026 ACCA Practice Platform. Built for premium digital exam preps.
+                © {new Date().getFullYear()} Accountly Practice Platform. Built for premium digital exam preps.
               </p>
             </div>
           </footer>

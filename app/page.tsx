@@ -15,7 +15,7 @@ export default function HomePage() {
   const [activeFaq, setActiveFaq] = React.useState<number | null>(null);
 
   const stats = [
-    { label: 'Active ACCA Aspirants', value: '14,250+' },
+    { label: 'Active Accountly Aspirants', value: '14,250+' },
     { label: 'Practice Quizzes Generated', value: '450,000+' },
     { label: 'Average Score Improvement', value: '28%' },
     { label: 'Syllabus Coverage Rate', value: '100%' },
@@ -39,8 +39,8 @@ export default function HomePage() {
     },
     {
       icon: <GraduationCap className="w-6 h-6 text-purple-500" />,
-      title: 'ACCA Syllabus Aligned',
-      description: 'Covers Applied Knowledge (BT, MA, FA), Applied Skills (FR, AA, PM, etc.), and Strategic Professional courses.',
+      title: 'Syllabus Aligned',
+      description: 'From foundational business concepts to core technical execution and high-level strategic leadership.',
     },
   ];
 
@@ -48,11 +48,11 @@ export default function HomePage() {
     {
       number: '01',
       title: 'Select Parameters',
-      description: 'Choose your ACCA course, exact topic, question count, and preferred difficulty level (Easy, Medium, Hard).',
+      description: 'Choose your course, exact topic, question count, and preferred difficulty level (Easy, Medium, Hard).',
     },
     {
       number: '02',
-      title: 'ACCA AI Engine Invocation',
+      title: 'Accountly AI Engine Invocation',
       description: 'Our fine-tuned AI prompts process the parameters to generate authentic, challenging exam-style JSON questions.',
     },
     {
@@ -64,23 +64,23 @@ export default function HomePage() {
 
   const testimonials = [
     {
-      name: 'Sarah Jenkins',
-      role: 'ACCA Affiliate, London',
-      text: 'The AI Quiz Generator on this platform was a lifesaver for my FR and AA exams. The instant detailed explanations for wrong answers helped me improve my score by 25% on my final attempt!',
+      name: 'Aisha Khan',
+      role: 'Foundation Level Student',
+      text: "The AI quizzes are a huge help for FA1 and MA1. The best part is that when you get an answer wrong, it doesn't just show you the correct option—it actually explains in detail exactly where you made the mistake.",
       avatar: 'https://picsum.photos/seed/sarah/100/100',
     },
     {
-      name: 'Daniel Kim',
+      name: 'Zain Ahmed',
       role: 'Applied Skills Student',
-      text: 'The weak topic detector pointed out that I consistently made errors on Leases (IFRS 16). The personalized recommendations allowed me to practice only those parts until I mastered them.',
+      text: "I was really struggling with Consolidation (IFRS 10) and kept making the same mistakes. The platform flagged that exact weak area and gave me customized practice questions until the concept finally clicked.",
       avatar: 'https://picsum.photos/seed/daniel/100/100',
     },
   ];
 
   const faqs = [
     {
-      q: "Does this platform use the official ACCA syllabus?",
-      a: "Yes. Our custom ACCA AI models are explicitly guided by the official, current ACCA syllabus, covering all primary accounting standards (IAS/IFRS), auditing guidelines (ISAs), and corporate regulations."
+      q: "Does this platform use the official syllabus?",
+      a: "Yes. Our custom Accountly AI models are explicitly guided by the official, current syllabus, covering all primary accounting standards (IAS/IFRS), auditing guidelines (ISAs), and corporate regulations."
     },
     {
       q: "Are the AI-generated questions unique?",
@@ -102,11 +102,11 @@ export default function HomePage() {
           {/* Hero text */}
           <div className="lg:col-span-7 flex flex-col items-start gap-6 text-left">
             <Badge variant="premium" className="mb-2">
-              ✨ Advanced AI Practice for ACCA Exams
+              ✨ Advanced AI Practice for Professional Exams
             </Badge>
             
             <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
-              Master Your ACCA Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">ACCA AI</span>
+              Master Your Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Accountly</span>
             </h1>
             
             <p className="text-lg text-slate-600 dark:text-slate-400 font-normal leading-relaxed max-w-xl">
@@ -204,7 +204,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 max-w-2xl mx-auto">
             <Badge variant="info" className="mx-auto">Features Grid</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Powerful Tools Crafted for ACCA Success
+              Powerful Tools Crafted for Success
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm">
               Unlock smart study habits and maximize your pass rates with a structured, AI-driven practicing environment.
@@ -231,7 +231,7 @@ export default function HomePage() {
           <div className="text-center flex flex-col gap-4 max-w-2xl mx-auto">
             <Badge variant="warning" className="mx-auto">Engine Blueprint</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              How the ACCA AI Platform Works
+              How the Accountly Platform Works
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm">
               From syllabus setup to targeted practice in three highly efficient steps.
@@ -291,7 +291,7 @@ export default function HomePage() {
             <div className="p-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/40 rounded-2xl flex flex-col gap-3">
               <Clock className="w-5 h-5 text-emerald-500" />
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">Time Optimized</h4>
-              <p className="text-xs text-slate-500 leading-relaxed">Customize timed sessions to match the real ACCA 3.2-hour criteria.</p>
+              <p className="text-xs text-slate-500 leading-relaxed">Customize timed sessions to match the real exam criteria.</p>
             </div>
             <div className="p-5 bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800/40 rounded-2xl flex flex-col gap-3">
               <Trophy className="w-5 h-5 text-amber-500" />
@@ -422,7 +422,7 @@ export default function HomePage() {
               Frequently Asked Questions
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm">
-              Everything you need to know about our ACCA AI Practice platform.
+              Everything you need to know about our Accountly Practice platform.
             </p>
           </div>
 

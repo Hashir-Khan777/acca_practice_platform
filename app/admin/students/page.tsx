@@ -78,7 +78,7 @@ export default function AdminStudentsPage() {
             <thead className="bg-slate-50 dark:bg-slate-900 uppercase text-[10px] font-mono font-extrabold text-slate-400 border-b border-slate-100 dark:border-slate-800">
               <tr>
                 <th className="px-6 py-4">Student</th>
-                <th className="px-6 py-4">ACCA Study Level</th>
+                <th className="px-6 py-4">Study Level</th>
                 <th className="px-6 py-4">Subscription Plan</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4 text-center">Quizzes Solved</th>

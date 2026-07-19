@@ -75,7 +75,7 @@ export default function StudentProfilePage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-lg">
       <div className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-900 pb-4">
         <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Student Profile</h2>
-        <p className="text-xs text-slate-500">Edit your credentials, country parameters, and target ACCA study level.</p>
+        <p className="text-xs text-slate-500">Edit your credentials, country parameters, and target study level.</p>
       </div>
 
       {profileSuccess && (
@@ -115,17 +115,17 @@ export default function StudentProfilePage() {
         />
 
         <Select
-          label="Target ACCA Study Level"
+          label="Target Study Level"
           options={accaLevels}
           value={profileLevel}
           onChange={(e) => setProfileLevel(e.target.value)}
         />
 
-        <Input
-          label="Target ACCA Study Level"
+        {/* <Input
+          label="Target Study Level"
           value={profileLevel}
           onChange={(e) => setProfileLevel(e.target.value)}
-        />
+        /> */}
 
         <div className="mt-2 flex justify-end">
           <Button variant="primary" type="submit">

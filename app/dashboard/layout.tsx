@@ -182,7 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <span className="font-extrabold text-sm tracking-tight hidden sm:inline bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                  ACCA AI Portal
+                  Accountly Portal
                 </span>
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   <div className="flex flex-col gap-6">
                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-                      <span className="font-extrabold text-sm text-emerald-500">ACCA Workspace</span>
+                      <span className="font-extrabold text-sm text-emerald-500">Accountly Workspace</span>
                       <button onClick={() => setMobileSidebarOpen(false)} className="p-1 rounded-full text-slate-400">
                         <X className="w-5 h-5" />
                       </button>
@@ -353,7 +353,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Dialog isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} title="Upgrade to Full-Pass Premium">
           <div className="flex flex-col gap-5 text-left py-2">
             <p className="text-xs text-slate-500 leading-relaxed">
-              Gain unlimited access to fine-tuned ACCA AI question generations, smart topic weakness tracking metrics, and detailed report scorecard downloads.
+              Gain unlimited access to fine-tuned Accountly AI question generations, smart topic weakness tracking metrics, and detailed report scorecard downloads.
             </p>
             <div className="p-4 bg-slate-900 text-white rounded-2xl flex justify-between items-center">
               <div className="flex flex-col gap-0.5 text-left">
