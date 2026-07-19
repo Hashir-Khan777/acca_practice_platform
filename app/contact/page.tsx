@@ -73,7 +73,7 @@ export default function ContactPage() {
             How Can We Assist Your Studies?
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            Have questions about institutional licenses, premium billing, or standard syllabi? Drop us a line and our tutor support desk will reply within 12 hours.
+            Have questions about institutional licenses, premium billing, or standard syllabi? Drop us a line and our tutor support desk will reply within 6 hours.
           </p>
         </div>
       </section>
@@ -85,15 +85,15 @@ export default function ContactPage() {
           {/* Business Info / Map Column */}
           <div className="lg:col-span-5 flex flex-col gap-8 text-left">
             <div className="flex flex-col gap-4">
-              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Business Office</h3>
+              <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Contact & Support</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Our main tutoring syllabus and technology offices are located in London, closely coordinated with major certified learning centers.
+                Our tutoring syllabus and technology teams operate entirely online, allowing us to seamlessly support students globally.
               </p>
             </div>
 
             {/* Core Info Cards */}
             <div className="flex flex-col gap-4">
-              <Card className="p-4 flex gap-4 items-center">
+              {/* <Card className="p-4 flex gap-4 items-center">
                 <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
                   <MapPin className="w-5 h-5" />
                 </div>
@@ -101,7 +101,7 @@ export default function ContactPage() {
                   <span className="text-xs font-extrabold text-slate-900 dark:text-slate-200">Address</span>
                   <span className="text-xs text-slate-500">12 High Holborn, London, WC1V 6PX, UK</span>
                 </div>
-              </Card>
+              </Card> */}
 
               <Card className="p-4 flex gap-4 items-center">
                 <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
@@ -109,7 +109,7 @@ export default function ContactPage() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-extrabold text-slate-900 dark:text-slate-200">Student Support Email</span>
-                  <span className="text-xs text-slate-500">support@accapractice.ai</span>
+                  <span className="text-xs text-slate-500">hashirkhanacca2025@gmail.com</span>
                 </div>
               </Card>
 
@@ -119,20 +119,20 @@ export default function ContactPage() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-xs font-extrabold text-slate-900 dark:text-slate-200">Support Desk Hotline</span>
-                  <span className="text-xs text-slate-500">+44 20 7946 0958</span>
+                  <span className="text-xs text-slate-500">+92 324 4447156</span>
                 </div>
               </Card>
             </div>
 
             {/* Google Map Placeholder */}
-            <div className="w-full h-48 bg-slate-200 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-inner">
+            {/* <div className="w-full h-48 bg-slate-200 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl overflow-hidden relative shadow-inner">
               <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: "url('https://picsum.photos/seed/london_map/600/300')" }} />
               <div className="absolute inset-0 bg-slate-900/10" />
               <div className="absolute bottom-4 left-4 p-2 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border border-slate-100 dark:border-slate-800 rounded-xl flex items-center gap-1.5 shadow-md">
                 <MapPin className="w-4 h-4 text-emerald-500" />
                 <span className="text-[10px] font-mono font-bold text-slate-800 dark:text-slate-200">Holborn Office, London</span>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Form Column */}

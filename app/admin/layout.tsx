@@ -142,7 +142,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { id: 'inbox', name: 'Visitor Inbox', path: '/admin/inbox', icon: <Inbox className="w-4 h-4" /> },
     { id: 'announcements', name: 'Announcements', path: '/admin/announcements', icon: <Bell className="w-4 h-4" /> },
     { id: 'logs', name: 'Audit Logs', path: '/admin/logs', icon: <Activity className="w-4 h-4" /> },
-    { id: 'settings', name: 'HQ Configs', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+    // { id: 'settings', name: 'HQ Configs', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
   ];
 
   return (

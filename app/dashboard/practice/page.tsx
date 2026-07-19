@@ -266,6 +266,8 @@ export default function StudentPracticeQuizPage() {
       });
       const result = await res.json();
       if (res.ok && result.success) {
+        setActiveQuiz(null);
+        localStorage.removeItem('acca_active_quiz_session');
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
 
@@ -307,6 +309,60 @@ export default function StudentPracticeQuizPage() {
       console.log(err, 'err')
     }
   };
+
+  // Restore active quiz session from localStorage on mount
+  React.useEffect(() => {
+    const rawSession = localStorage.getItem('acca_active_quiz_session');
+    if (rawSession) {
+      try {
+        const session = JSON.parse(rawSession);
+        if (session.activeQuiz) {
+          let adjustedSeconds = session.quizSecondsRemaining;
+          if (session.quizTimerOption === 'yes' && session.savedAt) {
+            const elapsed = Math.round((new Date().getTime() - new Date(session.savedAt).getTime()) / 1000);
+            adjustedSeconds = Math.max(0, session.quizSecondsRemaining - elapsed);
+          }
+          
+          if (session.quizTimerOption === 'yes' && adjustedSeconds <= 0) {
+            setActiveQuiz(session.activeQuiz);
+            setActiveQuizAnswers(session.activeQuizAnswers || {});
+            setQuizSecondsRemaining(0);
+            setTimeout(() => {
+              handleSubmitQuiz(true);
+            }, 100);
+            return;
+          }
+
+          setActiveQuiz(session.activeQuiz);
+          setActiveQuizAnswers(session.activeQuizAnswers || {});
+          setCurrentQuestionIdx(session.currentQuestionIdx || 0);
+          setQuizSecondsRemaining(adjustedSeconds);
+          setQuizStartTime(session.quizStartTime ? new Date(session.quizStartTime) : new Date());
+          setBookmarkedQuestions(session.bookmarkedQuestions || []);
+          setQuizTimerOption(session.quizTimerOption || 'yes');
+        }
+      } catch (e) {
+        console.error('Failed to restore active quiz session:', e);
+      }
+    }
+  }, []);
+
+  // Save active quiz session to localStorage whenever states change
+  React.useEffect(() => {
+    if (activeQuiz) {
+      const sessionData = {
+        activeQuiz,
+        activeQuizAnswers,
+        currentQuestionIdx,
+        quizSecondsRemaining,
+        quizStartTime: quizStartTime ? quizStartTime.toISOString() : null,
+        bookmarkedQuestions,
+        quizTimerOption,
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem('acca_active_quiz_session', JSON.stringify(sessionData));
+    }
+  }, [activeQuiz, activeQuizAnswers, currentQuestionIdx, quizSecondsRemaining, quizStartTime, bookmarkedQuestions, quizTimerOption]);
 
   return (
     <div className="w-full">
