@@ -314,7 +314,7 @@ export default function PageWrapper({
                   <span className="font-bold text-base text-slate-900 dark:text-white">Accountly AI Practice</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  The ultimate SaaS simulation practice engine for all levels. Driven by custom fine-tuned Accountly AI models.
+                  The ultimate simulation practice engine for all levels. Driven by custom fine-tuned Accountly AI models.
                 </p>
                 <div className="flex items-center gap-3 text-xs text-slate-400 mt-2">
                   <Shield className="w-4 h-4 text-emerald-500" />
@@ -325,10 +325,10 @@ export default function PageWrapper({
               {/* Middle Column 1 */}
               <div>
                 <h4 className="text-xs font-extrabold text-slate-900 dark:text-slate-200 uppercase tracking-widest mb-4">
-                  SaaS Platform
+                  Platform
                 </h4>
                 <ul className="flex flex-col gap-2.5 text-xs text-slate-500 dark:text-slate-400">
-                  <li onClick={() => router.push('/')} className="hover:text-emerald-500 transition-colors cursor-pointer">SaaS Home</li>
+                  <li onClick={() => router.push('/')} className="hover:text-emerald-500 transition-colors cursor-pointer">Home</li>
                   <li onClick={() => router.push('/features')} className="hover:text-emerald-500 transition-colors cursor-pointer">AI Features</li>
                   <li onClick={() => router.push('/#pricing')} className="hover:text-emerald-500 transition-colors cursor-pointer">Subscription Pricing</li>
                   <li onClick={() => router.push('/#faqs')} className="hover:text-emerald-500 transition-colors cursor-pointer">FAQs</li>
@@ -342,7 +342,7 @@ export default function PageWrapper({
                 </h4>
                 <ul className="flex flex-col gap-2.5 text-xs text-slate-500 dark:text-slate-400">
                   <li onClick={() => router.push('/about')} className="hover:text-emerald-500 transition-colors cursor-pointer">Our Mission</li>
-                  <li onClick={() => router.push('/about#roadmap')} className="hover:text-emerald-500 transition-colors cursor-pointer">SaaS Roadmap</li>
+                  {/* <li onClick={() => router.push('/about#roadmap')} className="hover:text-emerald-500 transition-colors cursor-pointer">SaaS Roadmap</li> */}
                   <li onClick={() => router.push('/contact')} className="hover:text-emerald-500 transition-colors cursor-pointer">Get in Touch</li>
                   <li onClick={() => router.push('/about#team')} className="hover:text-emerald-500 transition-colors cursor-pointer">Meet the Team</li>
                 </ul>

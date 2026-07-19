@@ -59,7 +59,7 @@ export default function FeaturesPage() {
         <div className="max-w-4xl mx-auto flex flex-col gap-6">
           <Badge variant="premium" className="mx-auto">Platform Tour</Badge>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Comprehensive SaaS Practice Toolkit
+            Comprehensive Practice Toolkit
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
             Review detailed descriptions of the key technology modules that help students achieve up to 28% higher pass rates compared to traditional methods.

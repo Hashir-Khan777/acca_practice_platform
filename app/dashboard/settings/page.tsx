@@ -25,7 +25,7 @@ export default function StudentSettingsPage() {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-6 max-w-lg">
       <div className="flex flex-col gap-1 border-b border-slate-100 dark:border-slate-900 pb-4">
-        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">SaaS Preferences & Settings</h2>
+        <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Preferences & Settings</h2>
         <p className="text-xs text-slate-500">Manage notifications, interface language, and study schedules.</p>
       </div>
 
@@ -77,7 +77,7 @@ export default function StudentSettingsPage() {
 
         <div className="mt-4 flex justify-end">
           <Button variant="primary" type="submit">
-            Save SaaS Preferences
+            Save Preferences
           </Button>
         </div>
       </form>

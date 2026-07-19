@@ -155,7 +155,7 @@ export default function StudentQuizAnalysisPage() {
             </Badge>
             <h2 className="text-lg font-extrabold leading-tight">
               {latestAttempt.percentage >= 50 
-                  ? 'Congratulations, you surpassed the ACCA threshold!' 
+                  ? 'Congratulations, you surpassed the threshold!' 
                   : 'A bit short this time. Tweak your concepts and retry.'}
             </h2>
             <span className="text-[10px] text-slate-500 mt-1 font-mono">
@@ -257,7 +257,7 @@ export default function StudentQuizAnalysisPage() {
                 }
 
                 <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100/80 dark:border-slate-850 mt-1">
-                  <span className="font-extrabold text-slate-800 dark:text-slate-200 text-xs block mb-1">Tutor Explanation & ACCA Standard:</span>
+                  <span className="font-extrabold text-slate-800 dark:text-slate-200 text-xs block mb-1">Tutor Explanation & Standard:</span>
                   <p className="italic text-xs text-slate-500 leading-relaxed">{q.explanation}</p>
                 </div>
               </Card>

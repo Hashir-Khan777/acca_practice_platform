@@ -4,7 +4,7 @@ import "./globals.css"; // Global styles
 export const metadata: Metadata = {
   title: "Accountly AI Practice Platform",
   description:
-    "Practice CA, ACCA, ICMA, and professional syllabus concepts with Accountly AI.",
+    "Master your accounting qualification and professional syllabus concepts with Accountly AI. Practice questions, mock exams, and interactive learning tools to enhance your understanding and exam readiness.",
 };
 
 export default function RootLayout({

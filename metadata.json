@@ -1,6 +1,6 @@
 {
   "name": "Accountly AI Practice Platform",
-  "description": "A premium SaaS platform for students to generate unlimited practice quizzes, track streaks, and receive smart study recommendations powered by Accountly AI.",
+  "description": "Master your accounting qualification and professional syllabus concepts with Accountly AI. Practice questions, mock exams, and interactive learning tools to enhance your understanding and exam readiness.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

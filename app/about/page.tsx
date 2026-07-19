@@ -34,7 +34,7 @@ export default function AboutPage() {
             Pioneering the Future of Professional Education
           </h1>
           <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
-            We are a team of certified Chartered Accountants, SaaS creators, and AI engineers committed to making world-class practice materials instantly accessible to anyone, anywhere.
+            We are a team of certified Chartered Accountants, creators, and AI engineers committed to making world-class practice materials instantly accessible to anyone, anywhere.
           </p>
         </div>
       </section>
@@ -61,7 +61,7 @@ export default function AboutPage() {
             <div className="flex flex-col gap-4 text-xs">
               <div>
                 <span className="font-extrabold text-slate-800 dark:text-slate-200">Our Mission:</span>
-                <p className="text-slate-500 mt-1">To accelerate and simplify the exam path for 1 million students globally by delivering responsive, premium SaaS training tools.</p>
+                <p className="text-slate-500 mt-1">To accelerate and simplify the exam path for 1 million students globally by delivering responsive, premium training tools.</p>
               </div>
               <hr className="border-slate-100 dark:border-slate-800/80" />
               <div>
