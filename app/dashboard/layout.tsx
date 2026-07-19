@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [store, setStore] = React.useState<any>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<any[]>([]);
-  const [showNotificationBadge, setShowNotificationBadge] = React.useState(true);
+  const [showNotificationBadge, setShowNotificationBadge] = React.useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = React.useState(false);
 
   React.useEffect(() => {
@@ -85,6 +85,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           document.documentElement.classList.add('dark');
         } else {
           document.documentElement.classList.remove('dark');
+        }
+
+        if (announcements.length > 0) {
+          setNotifications(announcements);
+          setShowNotificationBadge(true);
         }
 
         // Build notifications
