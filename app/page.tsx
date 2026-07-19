@@ -71,7 +71,7 @@ export default function HomePage() {
     },
     {
       name: 'Zain Ahmed',
-      role: 'Applied Skills Student',
+      role: 'Foundation Level Student',
       text: "I was really struggling with Consolidation (IFRS 10) and kept making the same mistakes. The platform flagged that exact weak area and gave me customized practice questions until the concept finally clicked.",
       avatar: 'https://picsum.photos/seed/daniel/100/100',
     },
