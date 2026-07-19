@@ -273,6 +273,12 @@ export default function StudentPracticeQuizPage() {
       const result = await res.json();
       if (res.ok && result.success) {
         setActiveQuiz(null);
+        try {
+          await document.exitFullscreen();
+          updateStore({ ...store, isQuizActive: true });
+        } catch (err) {
+          console.log(err, 'err')
+        }
         localStorage.removeItem('acca_active_quiz_session');
         updateStore({ ...store, isQuizActive: false });
         const savedAttempt = result.data.attempt;
