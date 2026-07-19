@@ -115,6 +115,7 @@ export default function StudentPracticeQuizPage() {
 
     try {
       await document.documentElement.requestFullscreen();
+      updateStore({ ...store, isQuizActive: true });
     } catch (err) {
       console.log(err, 'err')
     }
@@ -273,6 +274,7 @@ export default function StudentPracticeQuizPage() {
       if (res.ok && result.success) {
         setActiveQuiz(null);
         localStorage.removeItem('acca_active_quiz_session');
+        updateStore({ ...store, isQuizActive: false });
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
 
@@ -375,6 +377,7 @@ export default function StudentPracticeQuizPage() {
         if (activeQuiz) {
           setActiveQuiz(null);
           localStorage.removeItem('acca_active_quiz_session');
+          updateStore({ ...store, isQuizActive: false });
         }
       }
     };
@@ -391,6 +394,7 @@ export default function StudentPracticeQuizPage() {
         if (devToolsIsOpen) {
           setActiveQuiz(null);
           localStorage.removeItem('acca_active_quiz_session');
+          updateStore({ ...store, isQuizActive: false });
         }
       }
 
@@ -399,6 +403,7 @@ export default function StudentPracticeQuizPage() {
           if (activeQuiz) {
             setActiveQuiz(null);
             localStorage.removeItem('acca_active_quiz_session');
+            updateStore({ ...store, isQuizActive: false });
           }
         }
       };
@@ -407,10 +412,20 @@ export default function StudentPracticeQuizPage() {
         if (activeQuiz) {
           setActiveQuiz(null);
           localStorage.removeItem('acca_active_quiz_session');
+          updateStore({ ...store, isQuizActive: false });
         }
       };
     }
   }, [activeQuiz]);
+
+  // Clean up global quiz active layout state on unmount
+  React.useEffect(() => {
+    return () => {
+      if (store) {
+        updateStore({ ...store, isQuizActive: false });
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full">

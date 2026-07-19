@@ -76,7 +76,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             longestStreak: currentUser.totalQuizzes > 0 ? 5 : 0,
             lastPracticeDate: null
           },
-          theme: initialTheme
+          theme: initialTheme,
+          isQuizActive: false
         });
 
         // Apply theme
@@ -166,109 +167,113 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex flex-col text-slate-800 dark:text-slate-100 transition-colors duration-300">
         
         {/* HEADER BAR */}
-        <header className="h-16 border-b border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950/85 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="p-2 -ml-2 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 md:hidden cursor-pointer"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            
-            <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg text-white">
-                <BookOpen className="w-4 h-4" />
-              </div>
-              <span className="font-extrabold text-sm tracking-tight hidden sm:inline bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                ACCA AI Portal
-              </span>
-            </div>
-          </div>
-
-          {/* Action Widgets */}
-          <div className="flex items-center gap-4">
-            {/* Quick Stats */}
-            <div className="hidden lg:flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 rounded-lg">
-                <Zap className="w-3.5 h-3.5 fill-current" /> Streak: {store.streak.currentStreak} Days
-              </span>
-              <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg">
-                Level: {store.currentUser.plan === 'premium' ? 'Premium Full-Pass' : 'Free Tier'}
-              </span>
-            </div>
-
-            <ThemeToggle theme={store.theme} onToggle={toggleTheme} />
-            
-            {/* Notifications Trigger */}
-            <div className="relative cursor-pointer" onClick={() => { router.push('/dashboard/notifications'); setShowNotificationBadge(false); }}>
-              <div className="p-2.5 border border-slate-100 hover:border-slate-200 dark:border-slate-850 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-400 dark:text-slate-400 transition-all">
-                <Bell className="w-4 h-4" />
-              </div>
-              {showNotificationBadge && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
-              )}
-            </div>
-
-            {/* User Icon Avatar */}
-            <div className="flex items-center gap-2.5 border-l border-slate-100 dark:border-slate-800/80 pl-4">
-              <img src={store.currentUser.photo} alt="Avatar" className="w-8 h-8 rounded-full border border-slate-200 object-cover" />
-              <div className="hidden md:flex flex-col text-left">
-                <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight">{store.currentUser.name}</span>
-                <span className="text-[10px] text-slate-400 font-mono">Student</span>
+        {!store.isQuizActive && (
+          <header className="h-16 border-b border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950/85 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMobileSidebarOpen(true)}
+                className="p-2 -ml-2 rounded-xl text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 md:hidden cursor-pointer"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              
+              <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
+                <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg text-white">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <span className="font-extrabold text-sm tracking-tight hidden sm:inline bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
+                  ACCA AI Portal
+                </span>
               </div>
             </div>
-          </div>
-        </header>
+
+            {/* Action Widgets */}
+            <div className="flex items-center gap-4">
+              {/* Quick Stats */}
+              <div className="hidden lg:flex items-center gap-3 text-xs font-mono">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 rounded-lg">
+                  <Zap className="w-3.5 h-3.5 fill-current" /> Streak: {store.streak.currentStreak} Days
+                </span>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                  Level: {store.currentUser.plan === 'premium' ? 'Premium Full-Pass' : 'Free Tier'}
+                </span>
+              </div>
+
+              <ThemeToggle theme={store.theme} onToggle={toggleTheme} />
+              
+              {/* Notifications Trigger */}
+              <div className="relative cursor-pointer" onClick={() => { router.push('/dashboard/notifications'); setShowNotificationBadge(false); }}>
+                <div className="p-2.5 border border-slate-100 hover:border-slate-200 dark:border-slate-850 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-slate-400 dark:text-slate-400 transition-all">
+                  <Bell className="w-4 h-4" />
+                </div>
+                {showNotificationBadge && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
+                )}
+              </div>
+
+              {/* User Icon Avatar */}
+              <div className="flex items-center gap-2.5 border-l border-slate-100 dark:border-slate-800/80 pl-4">
+                <img src={store.currentUser.photo} alt="Avatar" className="w-8 h-8 rounded-full border border-slate-200 object-cover" />
+                <div className="hidden md:flex flex-col text-left">
+                  <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100 leading-tight">{store.currentUser.name}</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Student</span>
+                </div>
+              </div>
+            </div>
+          </header>
+        )}
 
         {/* CORE FRAMEWORK */}
         <div className="flex-grow flex relative overflow-hidden">
           
           {/* DESKTOP SIDEBAR */}
-          <aside className="w-64 border-r border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950 hidden md:flex flex-col justify-between py-6 px-4">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-1 text-left px-2.5">
-                <span className="text-[10px] uppercase font-mono tracking-widest text-slate-400 font-extrabold">WORKSPACE</span>
-                <span className="text-xs text-slate-500 font-medium truncate w-[200px]" title={store.currentUser.email}>{store.currentUser.email}</span>
+          {!store.isQuizActive && (
+            <aside className="w-64 border-r border-slate-100 dark:border-slate-800/60 bg-white dark:bg-slate-950 hidden md:flex flex-col justify-between py-6 px-4">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-1 text-left px-2.5">
+                  <span className="text-[10px] uppercase font-mono tracking-widest text-slate-400 font-extrabold">WORKSPACE</span>
+                  <span className="text-xs text-slate-500 font-medium truncate w-[200px]" title={store.currentUser.email}>{store.currentUser.email}</span>
+                </div>
+                
+                <nav className="flex flex-col gap-1">
+                  {navItems.map((tab) => {
+                    const isActive = pathname === tab.path;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => router.push(tab.path)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                          isActive
+                            ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border-l-4 border-emerald-500 pl-3'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/40'
+                        }`}
+                      >
+                        {tab.icon}
+                        {tab.name}
+                      </button>
+                    );
+                  })}
+                </nav>
               </div>
-              
-              <nav className="flex flex-col gap-1">
-                {navItems.map((tab) => {
-                  const isActive = pathname === tab.path;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => router.push(tab.path)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
-                        isActive
-                          ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 text-emerald-600 dark:text-emerald-400 border-l-4 border-emerald-500 pl-3'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/40'
-                      }`}
-                    >
-                      {tab.icon}
-                      {tab.name}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
 
-            <div className="flex flex-col gap-3 px-2">
-              {/* {store.currentUser.plan === 'free' && (
-                <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20 rounded-2xl flex flex-col gap-2">
-                  <span className="text-[10px] uppercase font-mono tracking-wider text-purple-600 dark:text-purple-400 font-extrabold flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> Upgrade Study Power
-                  </span>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">Unlock unlimited Gemini mock generations and PDF report card downloads.</p>
-                  <Button size="sm" variant="primary" className="h-[32px] mt-1" onClick={() => setShowUpgradeModal(true)}>
-                    Go Premium
-                  </Button>
-                </Card>
-              )} */}
-              <Button variant="ghost" size="sm" className="w-full text-slate-500" onClick={handleLogout}>
-                Logout Profile
-              </Button>
-            </div>
-          </aside>
+              <div className="flex flex-col gap-3 px-2">
+                {/* {store.currentUser.plan === 'free' && (
+                  <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20 rounded-2xl flex flex-col gap-2">
+                    <span className="text-[10px] uppercase font-mono tracking-wider text-purple-600 dark:text-purple-400 font-extrabold flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5" /> Upgrade Study Power
+                    </span>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal">Unlock unlimited Gemini mock generations and PDF report card downloads.</p>
+                    <Button size="sm" variant="primary" className="h-[32px] mt-1" onClick={() => setShowUpgradeModal(true)}>
+                      Go Premium
+                    </Button>
+                  </Card>
+                )} */}
+                <Button variant="ghost" size="sm" className="w-full text-slate-500" onClick={handleLogout}>
+                  Logout Profile
+                </Button>
+              </div>
+            </aside>
+          )}
 
           {/* MOBILE SIDEBAR DRAWER */}
           <AnimatePresence>
