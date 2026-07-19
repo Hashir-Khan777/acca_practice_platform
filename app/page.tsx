@@ -106,7 +106,7 @@ export default function HomePage() {
             </Badge>
             
             <h1 className="text-4xl sm:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
-              Master Your Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Accountly</span>
+              Master Your Exams with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">Accountly AI</span>
             </h1>
             
             <p className="text-lg text-slate-600 dark:text-slate-400 font-normal leading-relaxed max-w-xl">

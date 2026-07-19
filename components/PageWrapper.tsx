@@ -120,9 +120,7 @@ export default function PageWrapper({
               onClick={() => router.push('/')}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl text-white shadow-sm shadow-emerald-500/20 group-hover:scale-105 transition-all">
-                <BookOpen className="w-5 h-5" />
-              </div>
+              <img src="/logo.jpg" alt="Accountly Logo" className="w-9 h-9 rounded-xl object-cover shadow-sm group-hover:scale-105 transition-all" />
               <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
                 Accountly <span className="text-emerald-500 font-extrabold font-mono text-sm uppercase px-1.5 py-0.5 rounded-md border border-emerald-500/20 bg-emerald-500/10">AI</span>
               </span>
@@ -312,9 +310,7 @@ export default function PageWrapper({
               {/* Left Column */}
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg text-white">
-                    <BookOpen className="w-4 h-4" />
-                  </div>
+                  <img src="/logo.jpg" alt="Accountly Logo" className="w-8 h-8 rounded-lg object-cover" />
                   <span className="font-bold text-base text-slate-900 dark:text-white">Accountly AI Practice</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">

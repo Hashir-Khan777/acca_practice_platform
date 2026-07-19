@@ -178,9 +178,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
               
               <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
-                <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg text-white">
-                  <BookOpen className="w-4 h-4" />
-                </div>
+                <img src="/logo.jpg" alt="Accountly Logo" className="w-8 h-8 rounded-lg object-cover" />
                 <span className="font-extrabold text-sm tracking-tight hidden sm:inline bg-gradient-to-r from-slate-950 to-slate-800 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
                   Accountly Portal
                 </span>

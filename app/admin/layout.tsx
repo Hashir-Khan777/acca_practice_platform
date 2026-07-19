@@ -162,9 +162,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* HEADER BAR */}
         <header className="h-16 border-b border-slate-150 dark:border-slate-800/60 bg-white dark:bg-slate-950/85 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg text-white">
-              <Shield className="w-4 h-4" />
-            </div>
+            <img src="/logo.jpg" alt="Accountly Logo" className="w-8 h-8 rounded-lg object-cover" />
             <span className="font-extrabold text-sm tracking-tight bg-gradient-to-r from-slate-950 to-slate-850 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
               Accountly HQ
             </span>
