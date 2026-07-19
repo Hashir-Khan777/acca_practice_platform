@@ -51,15 +51,15 @@ export default function StudentProfilePage() {
       const result = await res.json();
       if (res.ok && result.success) {
         const updatedUser = result.data.user;
-        const updatedLogs = [
-          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'PROFILE_UPDATE', details: 'Updated user personal details', timestamp: new Date().toISOString() },
-          ...store.auditLogs
-        ];
+        // const updatedLogs = [
+        //   { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'PROFILE_UPDATE', details: 'Updated user personal details', timestamp: new Date().toISOString() },
+        //   ...store.auditLogs
+        // ];
 
         const updatedStore = {
           ...store,
           currentUser: updatedUser,
-          auditLogs: updatedLogs
+          // auditLogs: updatedLogs
         };
 
         updateStore(updatedStore);

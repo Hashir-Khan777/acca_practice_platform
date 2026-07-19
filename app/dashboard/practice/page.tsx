@@ -288,10 +288,10 @@ export default function StudentPracticeQuizPage() {
         const updatedUsers = store.users.map((u: any) => u.id === store.currentUser.id ? updatedCurrentUser : u);
         const updatedAttempts = [savedAttempt, ...store.attempts];
         
-        const updatedLogs = [
-          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'QUIZ_SUBMIT', details: `Completed ${activeQuiz.topic} quiz. Score: ${percentage}%`, timestamp: new Date().toISOString() },
-          ...store.auditLogs
-        ];
+        // const updatedLogs = [
+        //   { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'QUIZ_SUBMIT', details: `Completed ${activeQuiz.topic} quiz. Score: ${percentage}%`, timestamp: new Date().toISOString() },
+        //   ...store.auditLogs
+        // ];
 
         const updatedStore = {
           ...store,
@@ -299,7 +299,7 @@ export default function StudentPracticeQuizPage() {
           streak: updatedStreak,
           users: updatedUsers,
           attempts: updatedAttempts,
-          auditLogs: updatedLogs
+          // auditLogs: updatedLogs
         };
 
         updateStore(updatedStore);

@@ -31,22 +31,22 @@ export default function StudentHelpCenterPage() {
       if (res.ok && result.success) {
         const newTicket = result.data.ticket;
         const updatedTickets = [newTicket, ...store.tickets];
-        const updatedLogs = [
-          { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'SUPPORT_TICKET_CREATE', details: `Subject: "${ticketSubject}"`, timestamp: new Date().toISOString() },
-          ...store.auditLogs
-        ];
+        setTicketSuccess(true);
+        setTimeout(() => setTicketSuccess(false), 3000);
+        setTicketSubject('');
+        setTicketMessage('');
+        // const updatedLogs = [
+        //   { id: 'log-' + Date.now(), user: store.currentUser.email, action: 'SUPPORT_TICKET_CREATE', details: `Subject: "${ticketSubject}"`, timestamp: new Date().toISOString() },
+        //   ...store.auditLogs
+        // ];
 
         const updatedStore = {
           ...store,
           tickets: updatedTickets,
-          auditLogs: updatedLogs
+          // auditLogs: updatedLogs
         };
 
         updateStore(updatedStore);
-        setTicketSubject('');
-        setTicketMessage('');
-        setTicketSuccess(true);
-        setTimeout(() => setTicketSuccess(false), 3000);
       }
     } catch (err: any) {}
   };
