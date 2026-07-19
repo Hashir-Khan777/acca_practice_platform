@@ -296,3 +296,18 @@ export const ContactMessage = mongoose.models.ContactMessage || mongoose.model<I
 export const Announcement = mongoose.models.Announcement || mongoose.model<IAnnouncement>('Announcement', AnnouncementSchema);
 export const AuditLog = mongoose.models.AuditLog || mongoose.model<IAuditLog>('AuditLog', AuditLogSchema);
 export const Settings = mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);
+
+// ==========================================
+// 12. SUBSCRIBER MODEL (NEWSLETTER SUBSCRIBERS)
+// ==========================================
+export interface ISubscriber extends Document {
+  email: string;
+  subscribedAt: Date;
+}
+
+const SubscriberSchema = new Schema<ISubscriber>({
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  subscribedAt: { type: Date, default: Date.now }
+});
+
+export const Subscriber = mongoose.models.Subscriber || mongoose.model<ISubscriber>('Subscriber', SubscriberSchema);

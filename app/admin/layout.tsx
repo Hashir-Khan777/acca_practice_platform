@@ -55,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         const msgRes = await fetch('/api/admin/inbox');
         const msgJson = await msgRes.json();
         const contactMessages = msgJson.success ? msgJson.data.messages : [];
+        const subscribers = msgJson.success ? msgJson.data.subscribers : [];
 
         // 6. Fetch audit logs
         const logsRes = await fetch('/api/admin/logs');
@@ -78,6 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           tickets,
           announcements,
           contactMessages,
+          subscribers,
           auditLogs,
           subjects,
           topics,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import { ContactMessage, AuditLog } from '@/lib/models';
+import { ContactMessage, AuditLog, Subscriber } from '@/lib/models';
 import { getAuthUser } from '@/lib/jwt';
 
 async function checkAdmin(req: NextRequest) {
@@ -35,10 +35,17 @@ export async function GET(req: NextRequest) {
       status: m.status
     }));
 
+    const rawSubscribers = await Subscriber.find().sort({ subscribedAt: -1 });
+    const subscribers = rawSubscribers.map((s: any) => ({
+      id: s._id.toString(),
+      email: s.email,
+      subscribedAt: s.subscribedAt
+    }));
+
     return NextResponse.json({
       success: true,
       message: 'Inquiries list retrieved successfully.',
-      data: { messages },
+      data: { messages, subscribers },
       errors: []
     });
 
@@ -66,31 +73,55 @@ export async function DELETE(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const messageId = searchParams.get('messageId');
+    const subscriberId = searchParams.get('subscriberId');
 
-    if (!messageId) {
-      return NextResponse.json({ success: false, message: 'Message ID is required.', data: {}, errors: ['Missing message ID'] }, { status: 400 });
+    if (!messageId && !subscriberId) {
+      return NextResponse.json({ success: false, message: 'Message ID or Subscriber ID is required.', data: {}, errors: ['Missing parameters'] }, { status: 400 });
     }
 
-    const matched = await ContactMessage.findByIdAndDelete(messageId);
-    if (!matched) {
-      return NextResponse.json({ success: false, message: 'Inquiry message not found.', data: {}, errors: ['Not found'] }, { status: 404 });
+    if (subscriberId) {
+      const matched = await Subscriber.findByIdAndDelete(subscriberId);
+      if (!matched) {
+        return NextResponse.json({ success: false, message: 'Subscriber not found.', data: {}, errors: ['Not found'] }, { status: 404 });
+      }
+
+      const audit = new AuditLog({
+        user: admin.email,
+        action: 'SUBSCRIBER_DELETE',
+        details: `Purged newsletter subscriber: ${matched.email}.`,
+        timestamp: new Date()
+      });
+      await audit.save();
+
+      return NextResponse.json({
+        success: true,
+        message: 'Newsletter subscriber permanently purged.',
+        data: {},
+        errors: []
+      });
     }
 
-    // Create Audit Log
-    const audit = new AuditLog({
-      user: admin.email,
-      action: 'CONTACT_MSG_DELETE',
-      details: `Purged inbox message ID ${messageId} from ${matched.name}.`,
-      timestamp: new Date()
-    });
-    await audit.save();
+    if (messageId) {
+      const matched = await ContactMessage.findByIdAndDelete(messageId);
+      if (!matched) {
+        return NextResponse.json({ success: false, message: 'Inquiry message not found.', data: {}, errors: ['Not found'] }, { status: 404 });
+      }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Visitor inquiry message permanently purged.',
-      data: {},
-      errors: []
-    });
+      const audit = new AuditLog({
+        user: admin.email,
+        action: 'CONTACT_MSG_DELETE',
+        details: `Purged inbox message ID ${messageId} from ${matched.name}.`,
+        timestamp: new Date()
+      });
+      await audit.save();
+
+      return NextResponse.json({
+        success: true,
+        message: 'Visitor inquiry message permanently purged.',
+        data: {},
+        errors: []
+      });
+    }
 
   } catch (error: any) {
     console.error('Admin DELETE Inbox Error:', error);

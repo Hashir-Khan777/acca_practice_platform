@@ -87,7 +87,7 @@ export default function PageWrapper({
     router.push('/login');
   };
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError('');
     if (!emailInput) {
@@ -98,8 +98,22 @@ export default function PageWrapper({
       setEmailError('Please enter a valid email address.');
       return;
     }
-    setEmailSubscribed(true);
-    setEmailInput('');
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput })
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setEmailSubscribed(true);
+        setEmailInput('');
+      } else {
+        setEmailError(json.message || 'Subscription failed.');
+      }
+    } catch (err) {
+      setEmailError('Connection failed.');
+    }
   };
 
   const navItems = [
