@@ -104,8 +104,8 @@ export default function StudentPracticeQuizPage() {
 
   const handleGenerateQuiz = async () => {
     // Enforce free tier limitations
-    const today = new Date().toISOString().split('T')[0];
-    const todayAttempts = store.attempts.filter((a: any) => a.date && a.date.startsWith(today)).length;
+    // const today = new Date().toISOString().split('T')[0];
+    // const todayAttempts = store.attempts.filter((a: any) => a.date && a.date.startsWith(today)).length;
 
     // if (store.currentUser.plan === 'free' && todayAttempts >= 5) {
     //   alert("You have reached your free daily limit of 5 quizzes. Please upgrade to Full-Pass Premium for unlimited AI generations!");
@@ -113,16 +113,21 @@ export default function StudentPracticeQuizPage() {
     //   return;
     // }
 
+    try {
+      await document.documentElement.requestFullscreen();
+    } catch (err) {
+      console.log(err, 'err')
+    }
+
     setIsGenerating(true);
-    setGenProgress(10);
     setGenMessage('Connecting to ACCA AI servers...');
 
     const progressInterval = setInterval(() => {
       setGenProgress(prev => {
         if (prev >= 90) return prev;
-        return prev + 15;
+        return prev + 10;
       });
-    }, 400);
+    }, 3000);
 
     try {
       setGenMessage('Formatting prompts aligned with syllabus & standards...');
@@ -168,7 +173,7 @@ export default function StudentPracticeQuizPage() {
         setIsGenerating(false);
         setGenProgress(0);
         setGenMessage('');
-        
+
         startPracticeSession(newQuiz);
       }
 
@@ -363,6 +368,49 @@ export default function StudentPracticeQuizPage() {
       localStorage.setItem('acca_active_quiz_session', JSON.stringify(sessionData));
     }
   }, [activeQuiz, activeQuizAnswers, currentQuestionIdx, quizSecondsRemaining, quizStartTime, bookmarkedQuestions, quizTimerOption]);
+
+  React.useEffect(() => {
+    document.onfullscreenchange = () => {
+      if (!document.fullscreenElement) {
+        if (activeQuiz) {
+          setActiveQuiz(null);
+          localStorage.removeItem('acca_active_quiz_session');
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      const threshold = 170;
+      const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+      const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+      const devToolsIsOpen =
+        !(heightThreshold && widthThreshold) &&
+        (widthThreshold || heightThreshold);
+
+      if (activeQuiz) {
+        if (devToolsIsOpen) {
+          setActiveQuiz(null);
+          localStorage.removeItem('acca_active_quiz_session');
+        }
+      }
+
+      window.onload = () => {
+        if (!document.fullscreenElement) {
+          if (activeQuiz) {
+            setActiveQuiz(null);
+            localStorage.removeItem('acca_active_quiz_session');
+          }
+        }
+      };
+  
+      window.onblur = () => {
+        if (activeQuiz) {
+          setActiveQuiz(null);
+          localStorage.removeItem('acca_active_quiz_session');
+        }
+      };
+    }
+  }, [activeQuiz]);
 
   return (
     <div className="w-full">
