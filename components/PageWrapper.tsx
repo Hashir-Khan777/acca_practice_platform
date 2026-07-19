@@ -330,7 +330,7 @@ export default function PageWrapper({
                 <ul className="flex flex-col gap-2.5 text-xs text-slate-500 dark:text-slate-400">
                   <li onClick={() => router.push('/')} className="hover:text-emerald-500 transition-colors cursor-pointer">Home</li>
                   <li onClick={() => router.push('/features')} className="hover:text-emerald-500 transition-colors cursor-pointer">AI Features</li>
-                  <li onClick={() => router.push('/#pricing')} className="hover:text-emerald-500 transition-colors cursor-pointer">Subscription Pricing</li>
+                  {/* <li onClick={() => router.push('/#pricing')} className="hover:text-emerald-500 transition-colors cursor-pointer">Subscription Pricing</li> */}
                   <li onClick={() => router.push('/#faqs')} className="hover:text-emerald-500 transition-colors cursor-pointer">FAQs</li>
                 </ul>
               </div>
