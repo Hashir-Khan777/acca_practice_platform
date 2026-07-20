@@ -146,7 +146,7 @@ Derive the actual difficulty of each question from how the uploaded Exam Kit que
 - Requires the candidate to first identify which method/approach applies before any calculation can begin — the correct approach is not obvious from the question framing.
 - Includes at least one deliberately misleading or irrelevant piece of data that a competent candidate must recognise and discard.
 - Distractors (for MCQ) must reflect a highly plausible but subtly flawed line of reasoning, not just an arithmetic slip.
-- Reserved for candidates operating at the top end of ACCA Foundation level — treat this as exam "stretch" questions, not routine practice.
+- Reserved for candidates operating at the top end of qualification level — treat this as exam "stretch" questions, not routine practice.
  
 Apply ONLY the rubric tier matching ${difficulty} to every question generated. Do not mix tiers within one batch unless ${difficulty} explicitly requests "mixed".
 
