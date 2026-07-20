@@ -226,7 +226,7 @@ export default function StudentQuizAnalysisPage() {
                       if (isSelected && isCorrectOpt) {
                         optClass = "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold";
                       } else if (isSelected && !isCorrectOpt) {
-                        optClass = "border-rose-500/30 bg-rose-500/10 text-rose-500 dark:text-rose-450 font-semibold";
+                        optClass = "border-rose-500/30 bg-rose-500/10 text-rose-500 dark:text-rose-400 font-semibold";
                       } else if (!isSelected && isCorrectOpt) {
                         optClass = "border-emerald-500/30 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-medium";
                       }
@@ -252,7 +252,7 @@ export default function StudentQuizAnalysisPage() {
                   </div>
                 : <div className="flex flex-col gap-2.5 mt-1">
                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-md">Correct Answer: {q.correct_answer}</span>
-                    <span className="text-rose-500 dark:text-rose-450 font-semibold text-md">Your Answer: {userAns}</span>
+                    <span className={`${isCorrect? "text-emerald-600 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"} font-semibold text-md`}>Your Answer: {userAns}</span>
                   </div>
                 }
 

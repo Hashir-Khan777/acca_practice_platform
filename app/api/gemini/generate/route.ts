@@ -79,6 +79,33 @@ export async function POST(req: NextRequest) {
       }
     }));
 
+    const fewShotExamples = [
+      {
+        id: 1,
+        type: "MCQ",
+        question: "An entity registered for sales tax purchases raw materials for $12,000 including sales tax at 20%. What is the recoverable input tax amount?",
+        options: ["$2,000", "$2,400", "$2,200", "$10,000"],
+        correct_answer: ["$2,000"],
+        explanation: "Recoverable input tax is calculated as $12,000 x (20 / 120) = $2,000."
+      },
+      {
+        id: 2,
+        type: "Input",
+        question: "A business has opening receivables of $15,000 and closing receivables of $19,000. Total credit sales for the year were $140,000. Calculate total cash received from customers during the year.",
+        options: [],
+        correct_answer: ["136000"],
+        explanation: "Cash received = Opening Receivables + Credit Sales - Closing Receivables ($15,000 + $140,000 - $19,000 = $136,000)."
+      },
+      {
+        id: 3,
+        type: "Excel",
+        question: "Review the following sales ledger control account variance summary and regional breakdown:\n\n| Region | Expected Receivables ($) | Actual Receivables ($) |\n| --- | --- | --- |\n| North | 45,000 | 45,000 |\n| South | 60,000 | 52,000 |\n| East | 30,000 | 30,000 |\n\nRegional Variance Chart:\n```\nNorth | ██████████ 0\nSouth | ████████████████ (-8,000)\nEast  | ██████████ 0\n```\n\nCalculate the total shortfall in receivables across all regions.",
+        options: [],
+        correct_answer: ["8000"],
+        explanation: "The South region shows a shortfall of $60,000 - $52,000 = $8,000. All other regions have zero variance."
+      }
+    ]
+
     const prompt = `
 ==================================================
 SYSTEM ROLE
@@ -86,11 +113,9 @@ SYSTEM ROLE
 
 You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
 
-Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material and topic must be ${topic}.
+Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
 
-Create completely original questions that assess the same learning outcomes without copying wording from the source material.
-
-Do not reproduce or paraphrase copyrighted content. Create new, original questions that test the same concepts and learning outcomes.
+Create completely original questions that assess the same learning outcomes without copying wording from the source material. Do not reproduce or paraphrase copyrighted content.
 
 ==================================================
 OBJECTIVE
@@ -98,157 +123,103 @@ OBJECTIVE
 
 - Generate exactly ${numQuestions || 10} JSON objects.
 - Never generate fewer or more.
-- Do not stop until all ${numQuestions || 10} questions are produced.
-- Return ONLY valid JSON.
-- Do not include introductions.
-- Do not include explanations outside the JSON.
-- Do not include notes.
-- Do not include markdown.
-- Do not include any text before or after the JSON array.
+- Return ONLY valid JSON — a single JSON array, nothing else.
+- No introductions, explanations, notes, markdown fences, or text before/after the JSON.
 
 ==================================================
 SOURCE MATERIAL
 ==================================================
 
-Use ONLY the uploaded ${subject} Study Text and Exam Kit and topic must be ${topic}.
-
-Requirements
-
-- Cover the syllabus naturally and proportionally.
 - Use the uploaded material only as a knowledge reference.
+- Cover the syllabus for ${topic} naturally and proportionally.
 - Never copy wording from the source material.
-- Never reference page numbers.
-- Never mention the uploaded files.
+- Never reference page numbers or mention the uploaded files.
 
 ==================================================
-QUESTION QUALITY STANDARDS
+CRITICAL RULE — NO ANSWER LEAKAGE
 ==================================================
 
-Every question must:
+This is a hard requirement. Violating it invalidates the question.
 
-- Match the exact style of official ACCA Foundation ${subject} examinations for the topic:${topic}.
-- Use professional ${difficulty} level British English.
-- Be ${difficulty} difficulty.
-- Test conceptual understanding where appropriate.
-- Test numerical calculations where appropriate.
-- Use realistic business scenarios whenever suitable.
-- Be mathematically correct.
-- Be internally consistent.
-- Avoid duplicates.
-- Avoid near-duplicate wording.
-- Cover different syllabus areas evenly.
+- The "question" field must NEVER contain the correct answer, a strong hint toward it, or any wording that reveals it (e.g. do not write "...which results in a profit of $500, what is the margin?" if $500 is itself derivable only from the answer).
+- For Excel questions, the embedded spreadsheet/table/chart data must be usable to REACH the answer through calculation or interpretation — it must never already display the final answer value being asked for.
+- Do not label any value in a spreadsheet or chart as "Answer", "Correct", "Result", or similar.
+- Do not include worked solutions, calculation steps, or reasoning inside the "question" field — that belongs only in "explanation".
+- Before finalizing each question, re-read the "question" field alone (without "correct_answer") and confirm a candidate could not simply read off the answer without doing the task.
+
+==================================================
+DIFFICULTY CALIBRATION (based on ${difficulty})
+==================================================
+
+Derive the actual difficulty of each question from how the uploaded Exam Kit questions of the corresponding difficulty are constructed — do not default to a generic style. Use this rubric strictly:
+
+**Easy**
+- Single-step recall or a one-step calculation.
+- Tests a definition, classification, or direct application of one formula.
+- No multi-stage reasoning required.
+
+**Medium**
+- Two-to-three step calculation, or requires linking two concepts together.
+- May require adjusting for one complicating factor (e.g. accruals, discounts, one variance).
+- Some interpretation of data required, but the path to the answer is fairly direct.
+
+**Hard**
+- Multi-step calculation (3+ stages) or requires synthesising multiple concepts.
+- Requires judgement, interpretation of ambiguous/conflicting data, or identifying which of several methods applies.
+- May include a distractor path that looks plausible but is wrong.
+
+Apply ONLY the rubric tier matching ${difficulty} to every question generated. Do not mix tiers within one batch unless ${difficulty} explicitly requests "mixed".
 
 ==================================================
 QUESTION FORMATS
 ==================================================
 
-Generate a mixture of the following formats.
+**Multiple Choice Questions (MCQ)**
+- Exactly four options.
+- One or more may be correct.
+- Distractors must be realistic (common calculation errors, plausible misconceptions) — not obviously wrong.
 
-Multiple Choice Questions
+**Input Questions**
+- No answer options (empty array).
+- Candidate calculates and provides a final numeric/short answer.
 
-- Four options.
-- One or more correct answers may be correct.
+**Excel Questions**
+- Include a realistic spreadsheet as a GFM markdown table.
+- Include a text-based chart (ASCII, e.g. using '#' or '█') inside a fenced code block.
+- The chart must contain data that requires interpretation, not a direct lookup.
+- The candidate must analyse both the table and the chart to answer — never a question answerable by reading one cell directly.
 
-Input Questions
-
-- No answer options.
-- Candidate calculates the final answer.
-- Number or calculation based only.
-
-Excel Questions
-
-- Include realistic spreadsheet content inside the question.
-- The spreadsheet should resemble Microsoft Excel using a text table.
-- Each Excel question must also include a text-based chart.
-- The chart must contain meaningful data that requires interpretation.
-- The candidate should analyse the spreadsheet and chart before answering.
-- Do not create Excel questions that only ask the candidate to read a value directly.
-- Follow the strict JSON escaping guidelines below.
+Only use these exact values for "type": 'MCQ', 'Input', 'Excel'. No other values.
 
 ==================================================
-STRICT EXCEL JSON ESCAPING RULES (CRITICAL FOR API PARSING)
+MARKDOWN FORMATTING RULES (react-markdown + remark-gfm COMPATIBLE)
 ==================================================
 
-For any question with "type": "Excel", you must embed a structured text layout inside the "question" string. To prevent JSON parsing crashes on the web frontend, you MUST follow these formatting rules inside the JSON string:
-
-1. Line Breaks: Use literal "\n\n" to separate text, tables, and charts. Do not insert actual unescaped newlines inside the JSON value.
-2. Table Syntax: Use clean Markdown pipe syntax. Keep data compact (maximum 4 rows and 4 columns) to fit web and mobile screens.
-3. Chart Syntax: Embed the ASCII chart using standard markdown code block formatting with clean text characters (like '#' or '█').
-4. Pipe Escaping: Inside a JSON string, all markdown pipe symbols used for tables or charts must be safely written without causing string termination issues.
-
-==================================================
-QUESTION TYPE VALUES
-==================================================
-
-Only use these values for the "type" field.
-
-- MCQ
-- Input
-- Excel
-
-Do not use any other values.
-
-==================================================
-MCQ REQUIREMENTS
-==================================================
-
-Every MCQ must:
-
-- Contain exactly four answer options.
-- Contain one or more correct answers.
-- Have realistic distractors.
-- Test understanding rather than memorisation.
-
-==================================================
-INPUT QUESTION REQUIREMENTS
-==================================================
-
-Every Input question must:
-
-- Contain no answer options.
-- Use an empty options array.
-- Require calculation or determination of a final answer.
-- Require only a numerical or short calculated answer.
-
-==================================================
-EXCEL QUESTION REQUIREMENTS
-==================================================
-
-Every Excel question must:
-
-Include:
-
-- A spreadsheet represented using a text table.
-- A text-based chart.
-- Realistic business data.
-
-The candidate should:
-
-- Interpret spreadsheet data.
-- Interpret chart trends.
-- Perform calculations where necessary.
-- Make decisions based on the spreadsheet information.
+These rules are mandatory because output is rendered with react-markdown and remark-gfm. Non-compliant markdown will break rendering.
+ 
+1. Tables - use standard GFM pipe-table syntax with a header separator row, for example a row of column headers, then a row of dashes as the separator, then data rows. Keep to a maximum of 4 columns and 4 data rows.
+ 
+2. Charts - wrap ASCII charts in a fenced code block (three backtick characters on their own line before and after the chart) so remark-gfm renders them as a code block and does not try to parse the characters as markdown.
+ 
+3. Line breaks - inside the JSON string, use the two-character escape sequence backslash-n for every line break (never a raw unescaped newline). Use two of these in a row to separate paragraph, table, and chart blocks so remark-gfm renders them as distinct blocks.
+ 
+4. Escaping - every double-quote character and backslash character used as literal text must be properly JSON-escaped. Pipe characters used as literal text (not as a table delimiter) must not break the table structure. Do not use HTML tags. Do not nest a fenced code block inside another fenced code block.
+ 
+5. No stray markdown - do not use bold, italics, or heading markers inside "question" fields outside of the Excel chart code block; keep formatting plain except for the table and chart in Excel questions.
 
 ==================================================
 EXPLANATION REQUIREMENTS
 ==================================================
 
-Every question must include a short explanation.
-
-Requirements
-
 - 1 to 3 sentences only.
 - Explain why the correct answer is correct.
-- Be concise.
-- Be accurate.
+- Concise and accurate. No restating the full question.
 
 ==================================================
-OUTPUT FORMAT
+OUTPUT SCHEMA
 ==================================================
 
-Return ONLY one valid JSON array.
-
-Each object must follow this schema exactly.
+Return ONLY one valid JSON array, each object exactly matching:
 
 [
   {
@@ -261,138 +232,73 @@ Each object must follow this schema exactly.
   }
 ]
 
-==================================================
-JSON RULES
-==================================================
-
-For every question
-
-id
-
-- Starts at 1.
-- Sequential with no gaps.
-- Ends at ${numQuestions || 10}.
-
-question
-
-- Must always exist.
-
-options
-
-- Always exists.
-- MCQ contains exactly four options.
-- Input contains an empty array.
-- Excel may use an empty array unless answer choices are required.
-
-correct_answer
-
-- Always an array.
-- Never a string.
-- Never null.
-
-explanation
-
-- Always present.
-
-type
-
-- Must be one of:
-  - MCQ
-  - Input
-  - Excel
+Field rules:
+- "id": starts at 1, sequential, no gaps, ends at ${numQuestions || 10}.
+- "question": always present; must pass the "no answer leakage" check above.
+- "options": MCQ → exactly four items. Input → empty array. Excel → empty array unless discrete answer choices are genuinely required.
+- "correct_answer": always an array, never a string, never null.
+- "explanation": always present.
+- "type": one of 'MCQ', 'Input', 'Excel' only.
 
 ==================================================
-QUESTION DISTRIBUTION
+QUESTION DISTRIBUTION — EXACT COUNTS (NOT PERCENTAGES)
 ==================================================
 
-- Multiple Choice Questions (50%)
-- Input Questions (30%)
-- Excel Questions (20%)
+Percentages are unreliable for small batches, so compute exact integer counts before generating anything:
 
-Mix the question types naturally throughout the output.
+1. Let N = ${numQuestions || 10}.
+2. mcqCount = round(N × 0.5)
+3. inputCount = round(N × 0.3)
+4. excelCount = N − mcqCount − inputCount   (this absorbs any rounding remainder — never let excelCount go negative; if it would, reduce mcqCount by 1 first)
 
-Do not group all questions of one type together.
+Worked example for N = 10: mcqCount = 5, inputCount = 3, excelCount = 2.
+Worked example for N = 7: mcqCount = 4 (round(3.5)), inputCount = 2 (round(2.1)), excelCount = 1.
 
-==================================================
-CONTENT REQUIREMENTS
-==================================================
-
-Across all ${numQuestions || 10} questions
-
-Include
-
-- Theory questions.
-- Conceptual questions.
-- Numerical calculations.
-- Business scenarios.
-- Spreadsheet interpretation.
-- Chart interpretation.
-
-Ensure balanced syllabus coverage.
+Generate EXACTLY mcqCount MCQs, EXACTLY inputCount Input questions, and EXACTLY excelCount Excel questions — total must equal N. Interleave the types throughout the array in a natural order; do not group all of one type together (e.g. avoid all MCQs first).
 
 ==================================================
-VALIDATION CHECKLIST
+SYLLABUS & CONTENT BALANCE
 ==================================================
 
-Before returning the response, verify internally that:
+Across all ${numQuestions || 10} questions, ensure a mix of:
+- Theory / conceptual questions
+- Numerical calculations
+- Realistic business scenarios
+- Spreadsheet interpretation (within Excel questions)
+- Chart interpretation (within Excel questions)
 
-✓ Exactly ${numQuestions || 10} questions have been generated.
+Distribute across different syllabus areas of ${topic} — do not cluster all questions on one sub-topic.
 
-✓ IDs run sequentially from 1 to ${numQuestions || 10}.
+==================================================
+FEW-SHOT EXAMPLES (Follow this exact format & quality)
+==================================================
 
-✓ JSON is valid.
+${JSON.stringify(fewShotExamples, null, 2)}
 
-✓ Every object contains all required fields.
+==================================================
+INTERNAL VALIDATION CHECKLIST (do not output this)
+==================================================
 
-✓ Every MCQ contains exactly four options.
+Before returning the response, silently verify:
+✓ Exactly N questions generated, IDs sequential 1→N.
+✓ JSON is valid and is the ONLY output.
+✓ Every object has all five required fields.
+✓ Every MCQ has exactly four options; every Input has an empty options array.
+✓ No "question" field reveals or hints at its own "correct_answer".
+✓ Every Excel question has a GFM table AND a fenced-code-block ASCII chart requiring interpretation.
+✓ correct_answer is always an array.
+✓ No duplicate questions or near-duplicate wording.
+✓ Counts exactly match mcqCount / inputCount / excelCount computed above.
+✓ Difficulty of every question matches the ${difficulty} rubric tier.
+✓ Only type values used: MCQ, Input, Excel.
 
-✓ Input questions contain an empty options array.
-
-✓ Excel questions include spreadsheet content.
-
-✓ Excel questions include a chart.
-
-✓ Charts require interpretation.
-
-✓ Correct answers are always arrays.
-
-✓ No duplicate questions exist.
-
-✓ No duplicated wording exists.
-
-✓ The required distribution is met:
-
-- Multiple Choice Questions (50%)
-- Input Questions (30%)
-- Excel Questions (20%)
-
-✓ Only these type values are used:
-
-- MCQ
-- Input
-- Excel
+If any check fails, regenerate internally before producing final output.
 
 ==================================================
 FINAL INSTRUCTIONS
 ==================================================
 
-Do not think aloud.
-
-Do not explain your reasoning.
-
-Do not include markdown.
-
-Do not include notes.
-
-Do not include headings in the output.
-
-Do not include any text before the JSON.
-
-Do not include any text after the JSON.
-
-Return ONLY one valid JSON array.
-
-If any validation fails, regenerate internally until every requirement is satisfied before producing the final response.
+Do not think aloud. Do not explain your reasoning. Do not include markdown fences around the JSON array itself, headings, notes, or any text before/after the JSON. Return ONLY the JSON array.
     `;
 
     // Define fallback models in priority order
@@ -414,35 +320,48 @@ If any validation fails, regenerate internally until every requirement is satisf
             ]
           }],
           config: {
-            systemInstruction: `You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
-            Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material and topic must be ${topic}.
-            Create completely original questions that assess the same learning outcomes without copying wording from the source material.
-            Do not reproduce or paraphrase copyrighted content. Create new, original questions that test the same concepts and learning outcomes.`,
+            temperature: 0.2,
+            systemInstruction: `You are an expert ACCA Foundation examiner writing examination-standard practice questions.
+            Strict Guidelines:
+            1. NEVER reveal, hint at, or leak the correct answer within the 'question' text field.
+            2. Ensure strict adhereance to difficulty level: ${difficulty}.
+            3. Formatting for Markdown tables and ASCII charts inside 'question' must be clean and compatible with react-markdown and remark-gfm.
+            4. Base questions strictly on the provided ACCA ${subject} Study Text and Exam Kit for topic: ${topic}.`,
             responseMimeType: "application/json",
             responseSchema: {
               type: Type.ARRAY,
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  id: { type: Type.INTEGER, description: "Sequential question index starting from 1" },
-                  question: { type: Type.STRING, description: "The ACCA exam question text, scenarios, or calculations" },
+                  id: { 
+                    type: Type.INTEGER, 
+                    description: "Sequential question index starting strictly from 1" 
+                  },
+                  type: { 
+                    type: Type.STRING, 
+                    enum: ["MCQ", "Input", "Excel"],
+                    description: "Must be strictly one of: MCQ, Input, or Excel" 
+                  },
+                  question: { 
+                    type: Type.STRING, 
+                    description: "The complete question scenario, table, or chart. DO NOT INCLUDE THE ANSWER OR SOLUTION HERE." 
+                  },
                   options: {
                     type: Type.ARRAY,
                     items: { type: Type.STRING },
-                    description: "List of 4 distinct and realistic multiple choice answers"
+                    description: "4 options for MCQ/Excel-MCQ. MUST BE AN EMPTY ARRAY [] for Input type."
                   },
                   correct_answer: {
                     type: Type.ARRAY,
                     items: { type: Type.STRING },
-                    description: "An array containing the exact matching correct option text"
+                    description: "Array containing exact string matching the correct option or numeric answer."
                   },
                   explanation: {
                     type: Type.STRING,
-                    description: "A detailed professional explanation citing ACCA syllabus concepts and accounting/audit standards"
-                  },
-                  type: { type: Type.STRING, description: "The category of the question (e.g. single)" }
+                    description: "1-3 sentences explaining why the answer is correct based on ACCA standards."
+                  }
                 },
-                required: ["id", "question", "options", "correct_answer", "explanation", "type"]
+                required: ["id", "type", "question", "options", "correct_answer", "explanation"]
               }
             }
           }
