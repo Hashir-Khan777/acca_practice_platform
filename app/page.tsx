@@ -48,7 +48,7 @@ export default function HomePage() {
     {
       number: '01',
       title: 'Select Parameters',
-      description: 'Choose your course, exact topic, question count, and preferred difficulty level (Easy, Medium, Hard).',
+      description: 'Choose your course, exact topic, question count, and preferred difficulty level (Easy, Medium, Hard, Extreme).',
     },
     {
       number: '02',

@@ -70,14 +70,14 @@ export interface ITopic extends Document {
   subjectId: mongoose.Types.ObjectId;
   name: string;
   description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
 }
 
 const TopicSchema = new Schema<ITopic>({
   subjectId: { type: Schema.Types.ObjectId, ref: 'Subject', required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
-  difficulty: { type: String, enum: ['easy', 'medium', 'hard'], default: 'medium' }
+  difficulty: { type: String, enum: ['easy', 'medium', 'hard', 'extreme'], default: 'medium' }
 });
 
 // ==========================================
@@ -96,7 +96,7 @@ export interface IQuiz extends Document {
   title: string;
   subject: string;
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
   type: 'MCQ' | 'Input' | 'Excel';
   questions: IQuestion[];
   generatedBy: 'AI' | 'Admin';
@@ -116,7 +116,7 @@ const QuizSchema = new Schema<IQuiz>({
   title: { type: String, required: true },
   subject: { type: String, required: true },
   topic: { type: String, required: true },
-  difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
+  difficulty: { type: String, enum: ['easy', 'medium', 'hard', 'extreme'], required: true },
   type: { type: String, enum: ['MCQ', 'Input', 'Excel'], required: true },
   questions: [QuestionSchema],
   generatedBy: { type: String, enum: ['AI', 'Admin'], default: 'AI' },
@@ -131,7 +131,7 @@ export interface IAttempt extends Document {
   quizId: string;
   subject: string;
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
   date: Date;
   score: number;
   totalQuestions: number;
@@ -148,7 +148,7 @@ const AttemptSchema = new Schema<IAttempt>({
   quizId: { type: String, required: true },
   subject: { type: String, required: true },
   topic: { type: String, required: true },
-  difficulty: { type: String, enum: ['easy', 'medium', 'hard'], required: true },
+  difficulty: { type: String, enum: ['easy', 'medium', 'hard', 'extreme'], required: true },
   date: { type: Date, default: Date.now },
   score: { type: Number, required: true },
   totalQuestions: { type: Number, required: true },

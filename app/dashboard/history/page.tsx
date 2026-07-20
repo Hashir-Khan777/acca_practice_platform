@@ -47,7 +47,8 @@ export default function StudentQuizHistoryPage() {
               { value: 'all', label: 'All Difficulties' },
               { value: 'easy', label: 'Easy' },
               { value: 'medium', label: 'Medium' },
-              { value: 'hard', label: 'Hard' }
+              { value: 'hard', label: 'Hard' },
+              { value: 'extreme', label: 'Extreme' },
             ]}
             value={historyDifficultyFilter}
             onChange={(e) => setHistoryDifficultyFilter(e.target.value)}
@@ -75,7 +76,7 @@ export default function StudentQuizHistoryPage() {
                   <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">{att.subject}</td>
                   <td className="px-6 py-4">{att.topic}</td>
                   <td className="px-6 py-4">
-                    <Badge variant={att.difficulty === 'easy' ? 'info' : att.difficulty === 'medium' ? 'warning' : 'danger'}>
+                    <Badge variant={att.difficulty === 'easy' ? 'info' : att.difficulty === 'medium' ? 'warning' : att.difficulty === 'hard' ? 'danger' : 'extreme'}>
                       {att.difficulty}
                     </Badge>
                   </td>

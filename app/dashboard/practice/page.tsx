@@ -22,7 +22,7 @@ export default function StudentPracticeQuizPage() {
   // Practice Quiz Form State
   const [quizSubject, setQuizSubject] = React.useState('');
   const [quizTopic, setQuizTopic] = React.useState('');
-  const [quizDifficulty, setQuizDifficulty] = React.useState<'easy' | 'medium' | 'hard'>('medium');
+  const [quizDifficulty, setQuizDifficulty] = React.useState<'easy' | 'medium' | 'hard' | 'extreme'>('easy');
   const [quizQuestionsCount, setQuizQuestionsCount] = React.useState(10);
   const [quizQuestionType, setQuizQuestionType] = React.useState<'MCQ' | 'Input' | 'Excel'>('MCQ');
   const [quizTimerOption, setQuizTimerOption] = React.useState('yes');
@@ -489,7 +489,8 @@ export default function StudentPracticeQuizPage() {
                 options={[
                   { value: 'easy', label: 'Easy (Knowledge Foundations)' },
                   { value: 'medium', label: 'Medium (Applied Scenarios)' },
-                  { value: 'hard', label: 'Hard (Complex Professional Case)' }
+                  { value: 'hard', label: 'Hard (Complex Professional Case)' },
+                  { value: 'extreme', label: 'Extreme (Challenging Professional Situations)' }
                 ]}
                 value={quizDifficulty}
                 onChange={(e: any) => setQuizDifficulty(e.target.value)}

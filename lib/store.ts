@@ -28,7 +28,7 @@ export interface Topic {
   subjectId: string;
   name: string;
   description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
 }
 
 export interface Question {
@@ -45,7 +45,7 @@ export interface Quiz {
   title: string;
   subject: string;
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
   type: 'MCQ' | 'Input' | 'Excel';
   questions: Question[];
   createdAt: string;
@@ -57,7 +57,7 @@ export interface Attempt {
   quizId: string;
   subject: string;
   topic: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: 'easy' | 'medium' | 'hard' | 'extreme';
   date: string;
   score: number; // raw correct count
   totalQuestions: number;

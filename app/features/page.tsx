@@ -19,7 +19,7 @@ export default function FeaturesPage() {
       description: 'Never practice with the exact same stale questions again. Our custom Accountly AI models ingest your exact Subject and Topic to craft authentic, highly challenging case scenarios on-the-fly.',
       bullets: [
         'Select MCQ, Input, or standard Excel types.',
-        'Choose Easy, Medium, or Hard difficulty levels.',
+        'Choose Easy, Medium, Hard or Extreme difficulty levels.',
         'Ensures 100% stable, compliant JSON outputs.',
         'No markdown, preambles, or formatting glitches.'
       ],
