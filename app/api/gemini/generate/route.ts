@@ -79,33 +79,6 @@ export async function POST(req: NextRequest) {
       }
     }));
 
-    const fewShotExamples = [
-      {
-        id: 1,
-        type: "MCQ",
-        question: "An entity registered for sales tax purchases raw materials for $12,000 including sales tax at 20%. What is the recoverable input tax amount?",
-        options: ["$2,000", "$2,400", "$2,200", "$10,000"],
-        correct_answer: ["$2,000"],
-        explanation: "Recoverable input tax is calculated as $12,000 x (20 / 120) = $2,000."
-      },
-      {
-        id: 2,
-        type: "Input",
-        question: "A business has opening receivables of $15,000 and closing receivables of $19,000. Total credit sales for the year were $140,000. Calculate total cash received from customers during the year.",
-        options: [],
-        correct_answer: ["136000"],
-        explanation: "Cash received = Opening Receivables + Credit Sales - Closing Receivables ($15,000 + $140,000 - $19,000 = $136,000)."
-      },
-      {
-        id: 3,
-        type: "Excel",
-        question: "Review the following sales ledger control account variance summary and regional breakdown:\n\n| Region | Expected Receivables ($) | Actual Receivables ($) |\n| --- | --- | --- |\n| North | 45,000 | 45,000 |\n| South | 60,000 | 52,000 |\n| East | 30,000 | 30,000 |\n\nRegional Variance Chart:\n```\nNorth | ██████████ 0\nSouth | ████████████████ (-8,000)\nEast  | ██████████ 0\n```\n\nCalculate the total shortfall in receivables across all regions.",
-        options: [],
-        correct_answer: ["8000"],
-        explanation: "The South region shows a shortfall of $60,000 - $52,000 = $8,000. All other regions have zero variance."
-      }
-    ]
-
     const prompt = `
 ==================================================
 SYSTEM ROLE
@@ -275,12 +248,6 @@ Across all ${numQuestions || 10} questions, ensure a mix of:
 - Chart interpretation (within Excel questions)
 
 Distribute across different syllabus areas of ${topic} — do not cluster all questions on one sub-topic.
-
-==================================================
-FEW-SHOT EXAMPLES (Follow this exact format & quality)
-==================================================
-
-${JSON.stringify(fewShotExamples, null, 2)}
 
 ==================================================
 INTERNAL VALIDATION CHECKLIST (do not output this)
