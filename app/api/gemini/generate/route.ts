@@ -80,15 +80,56 @@ export async function POST(req: NextRequest) {
     }));
 
     const prompt = `
-==================================================
-SYSTEM ROLE
-==================================================
+=======================================================
+ENGLISH LANGUAGE DIFFICULTY (based on ${difficulty})
+=======================================================
 
-You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
+The language complexity must always match the selected difficulty.
 
-Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
+This affects:
+- vocabulary
+- sentence structure
+- scenario complexity
+- amount of information
+- level of interpretation required
 
-Create completely original questions that assess the same learning outcomes without copying wording from the source material. Do not reproduce or paraphrase copyrighted content.
+Easy
+------
+- Use simple British English.
+- Familiar accounting terminology.
+- Minimal business context.
+- One clear task.
+- No unnecessary information.
+- Candidate should understand the question after reading it once.
+
+Medium
+--------
+- Use standard ACCA Foundation English.
+- Include realistic business context.
+- Introduce one or two accounting terms naturally.
+- Candidate may need to read parts of the scenario twice.
+
+Hard
+------
+- Use professional business English appropriate for ACCA Foundation.
+- Use realistic business communication.
+- Include reports, emails, management comments, extracts, or accounting records.
+- Include relevant and irrelevant information.
+- Candidate must identify which information matters.
+- Interpretation should be required before any calculation.
+
+Extreme
+---------
+- Use examination-quality professional English.
+- Rich business scenarios with natural writing.
+- Multiple paragraphs.
+- Mix narrative, financial information, and supporting documents.
+- Use professional accounting vocabulary without becoming overly technical.
+- Candidate should need careful reading before identifying the correct approach.
+- Difficulty should come from interpretation, judgement, and selecting relevant information—not confusing grammar or obscure vocabulary.
+
+The language should never become artificially complicated.
+Questions should be difficult because of accounting reasoning, not because of difficult English.
 
 ==================================================
 OBJECTIVE
@@ -124,30 +165,40 @@ This is a hard requirement. Violating it invalidates the question.
 DIFFICULTY CALIBRATION (based on ${difficulty})
 ==================================================
 
-Derive the actual difficulty of each question from how the uploaded Exam Kit questions of the corresponding difficulty are constructed — do not default to a generic style. Use this rubric strictly:
+Ground the actual difficulty of each question in how the uploaded Exam Kit's questions of the corresponding difficulty are built — do not default to a generic style. Difficulty is controlled by FOUR levers used together, not step count alone: (1) number of linked steps, (2) scenario length, (3) how wrong answers are produced, (4) how many syllabus areas are touched. Varying step count alone while leaving scenario length and distractor quality constant will not read as meaningfully harder — apply all four levers at every tier.
 
-**Easy**
-- Single-step recall or a one-step calculation.
-- Tests a definition, classification, or direct application of one formula.
-- No multi-stage reasoning required.
+**Easy** — scenario length approx. 15–35 words
+- One-step recall or one-step calculation within ${topic}: one formula, one figure in, one figure out.
+- Tests a definition, classification, or direct application of a single rule.
+- Simple adjustment, normal interpretation, some irrelevant data.
 
-**Medium**
-- Two-to-three step calculation, or requires linking two concepts together.
-- May require adjusting for one complicating factor (e.g. accruals, discounts, one variance).
-- Some interpretation of data required, but the path to the answer is fairly direct.
+**Medium** — scenario length approx. 40–70 words
+- Two-to-three linked steps, or two concepts within ${topic} used together (e.g. accruals plus one adjustment).
+- One complicating factor at most (a discount, an accrual, one variance).
+- Some interpretation required, but the path to the answer is fairly direct.
 
-**Hard**
-- Multi-step calculation (5+ stages) or requires synthesising multiple concepts.
-- Requires judgement, interpretation of ambiguous/conflicting data, or identifying which of several methods applies.
-- May include a distractor path that looks plausible but is wrong.
+**Hard** — scenario length approx. 80–130 words
+- 5+ linked steps combining two or more concepts within ${topic} synthesised together.
+- Requires judgement: the candidate must choose between two plausible approaches, or interpret data that isn't handed to them pre-sorted.
+- Include one distractor path that looks plausible but is wrong.
 
-**Extreme**
-- Multi-step calculation (10+ stages) combining several concepts from different syllabus areas in a single scenario.
-- Requires the candidate to first identify which method/approach applies before any calculation can begin — the correct approach is not obvious from the question framing.
-- Includes at least one deliberately misleading or irrelevant piece of data that a competent candidate must recognise and discard.
-- Distractors (for MCQ) must reflect a highly plausible but subtly flawed line of reasoning, not just an arithmetic slip.
-- Reserved for candidates operating at the top end of qualification level — treat this as exam "stretch" questions, not routine practice.
- 
+**Extreme** — scenario length approx. 150–250 words
+- 10+ linked steps combining all different syllabus areas within ${topic} in one scenario (e.g. a costing-method choice that feeds into a variance, or a depreciation-policy choice that feeds into a ratio). Only go beyond this if the uploaded Exam Kit's own hardest questions genuinely go further — do not invent complexity the source material doesn't support.
+- The candidate must first work out which method or approach applies; this is not stated or implied by the question framing.
+- Contains exactly one deliberately irrelevant or misleading figure that a competent candidate must notice and discard. It must be plausible enough to tempt a rushed candidate, not obviously junk.
+- Every MCQ distractor is the numeric result of actually carrying out a specific, named plausible error (see the rule below) — never an arbitrary number placed near the correct answer.
+- Must still be solvable by a well-prepared Foundation-level candidate inside normal exam time. This is the hardest question a strong candidate could realistically meet in this paper, not a professional-level problem — do not import complexity from outside the ${subject} Foundation syllabus.
+
+**Distractor construction rule (mandatory for Hard and Extreme MCQs)**
+Before writing a distractor, internally name the specific error it represents (e.g. "uses cost instead of net realisable value", "omits the part-year adjustment", "treats a variable cost as fixed"), then actually perform the calculation using that error to produce the distractor's number. Never invent a distractor number without deriving it this way. Do not include this internal reasoning in your output — only the final "options" and "correct_answer" arrays reflect it.
+
+**Calibration example (guidance only — never output this block or refer to it)**
+This uses depreciation purely to show the expected CONTRAST between tiers. Never reuse this topic, these numbers, or this wording in your actual output; ${topic} governs the real content.
+
+  Easy shape: "A non-current asset cost $12,000 and has a 6-year useful life with no residual value. What is the annual straight-line depreciation charge?" — one formula, one figure in, one figure out, roughly 20 words.
+
+  Extreme shape: a paragraph-length scenario where an asset is bought mid-year, its depreciation method changes partway through its life, it is part-exchanged for a new asset, and an unrelated insurance premium is mentioned as a distractor figure. The candidate must first decide which depreciation policy applies to which period before any figure can be calculated, and the insurance premium is never used in the correct answer. This is the LENGTH and STRUCTURE Extreme should have — build your actual Extreme question from ${topic}, not from depreciation, unless ${topic} literally is depreciation.
+
 Apply ONLY the rubric tier matching ${difficulty} to every question generated. Do not mix tiers within one batch unless ${difficulty} explicitly requests "mixed".
 
 ==================================================
@@ -156,18 +207,24 @@ QUESTION FORMATS
 
 **Multiple Choice Questions (MCQ)**
 - Exactly four options.
-- One or more may be correct.
-- Distractors must be realistic (common calculation errors, plausible misconceptions) — not obviously wrong.
+- Easy and Medium: exactly one correct option.
+- Hard and Extreme: normally one correct option; occasionally two, per the DIFFICULTY CALIBRATION section above.
+- Distractors must be realistic — apply the distractor construction rule above; mandatory for Hard and Extreme.
 
 **Input Questions**
 - No answer options (empty array).
-- Candidate calculates and provides a final numeric/short answer.
+- Candidate calculates and provides a final numeric answer.
 
 **Excel Questions**
 - Include a realistic spreadsheet as a GFM markdown table.
 - Include a text-based chart (ASCII, e.g. using '#' or '█') inside a fenced code block.
 - The chart must contain data that requires interpretation, not a direct lookup.
 - The candidate must analyse both the table and the chart to answer — never a question answerable by reading one cell directly.
+- Scale table/chart complexity to ${difficulty}:
+  - Easy: one small table (max 3 rows), read directly; chart is context only.
+  - Medium: table and chart together, one simple calculation links them.
+  - Hard: a figure from the table or the chart must be recalculated before it can be used with the other.
+  - Extreme: table and chart, plus one figure that must be derived — not given — before the main calculation can even start.
 
 Only use these exact values for "type": 'MCQ', 'Input', 'Excel'. No other values.
 
@@ -259,11 +316,13 @@ Before returning the response, silently verify:
 ✓ Every object has all five required fields.
 ✓ Every MCQ has exactly four options; every Input has an empty options array.
 ✓ No "question" field reveals or hints at its own "correct_answer".
-✓ Every Excel question has a GFM table AND a fenced-code-block ASCII chart requiring interpretation.
+✓ Every Excel question has a GFM table AND a fenced-code-block ASCII chart requiring interpretation, scaled to ${difficulty} as specified above.
 ✓ correct_answer is always an array.
 ✓ No duplicate questions or near-duplicate wording.
 ✓ Counts exactly match mcqCount / inputCount / excelCount computed above.
-✓ Difficulty of every question matches the ${difficulty} rubric tier.
+✓ Difficulty of every question matches the ${difficulty} rubric tier, including its scenario-length band.
+✓ Every Hard/Extreme MCQ distractor is traceable to a specific named error, not an arbitrary nearby number.
+✓ Every Extreme question combines two syllabus areas within ${topic} and includes exactly one discardable irrelevant figure.
 ✓ Only type values used: MCQ, Input, Excel.
 
 If any check fails, regenerate internally before producing final output.
@@ -295,12 +354,9 @@ Do not think aloud. Do not explain your reasoning. Do not include markdown fence
           }],
           config: {
             temperature: 0.2,
-            systemInstruction: `You are an expert ACCA Foundation examiner writing examination-standard practice questions.
-            Strict Guidelines:
-            1. NEVER reveal, hint at, or leak the correct answer within the 'question' text field.
-            2. Ensure strict adhereance to difficulty level: ${difficulty}.
-            3. Formatting for Markdown tables and ASCII charts inside 'question' must be clean and compatible with react-markdown and remark-gfm.
-            4. Base questions strictly on the provided ACCA ${subject} Study Text and Exam Kit for topic: ${topic}.`,
+            systemInstruction: `You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
+              Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
+              Create completely original questions that assess the same learning outcomes without copying wording from the source material. Do not reproduce or paraphrase copyrighted content.`,
             responseMimeType: "application/json",
             responseSchema: {
               type: Type.ARRAY,
