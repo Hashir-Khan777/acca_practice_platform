@@ -81,74 +81,237 @@ export async function POST(req: NextRequest) {
 
     const prompt = `
 ==================================================
-SYSTEM ROLE & OBJECTIVE
+SYSTEM ROLE
 ==================================================
-You are an experienced ACCA Foundation examiner creating original, exam-standard practice questions for ${topic} in ${subject}.
 
-- Generate EXACTLY ${numQuestions} JSON objects in a single JSON array.
-- Output MUST be valid JSON only — no introductions, markdown code blocks around the JSON array, notes, or post-text.
-- Do not copy wording, reference page numbers, or mention uploaded source files.
+You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
 
-==================================================
-QUESTION DISTRIBUTION & TYPES
-==================================================
-Compute exact counts (Total N = ${numQuestions}):
-1. mcqCount = round(N * 0.5)
-2. inputCount = round(N * 0.3)
-3. excelCount = N - mcqCount - inputCount
+Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
 
-Interleave types ('MCQ', 'Input', 'Excel') naturally across IDs 1 to N.
-
-Question Type Specs:
-- 'MCQ': Exactly 4 options. Realistic distractors reflecting common errors.
-- 'Input': "options": []. Numeric answers calculated by the candidate.
-- 'Excel': "options": []. MUST include a GFM pipe table AND an ASCII chart in a fenced code block. Both table and chart interpretation are required to solve.
+Create completely original questions that assess the same learning outcomes without copying wording from the source material. Do not reproduce or paraphrase copyrighted content.
 
 ==================================================
-MARKDOWN & PARSER VALIDATION (react-markdown + remark-gfm)
+OBJECTIVE
 ==================================================
-All Markdown generated inside JSON string fields MUST strictly comply with these rendering rules:
-1. GFM Pipe Tables: Use standard | Header | syntax with a |---| separator row. Max 4 columns, 4 rows. Do not use literal | characters inside cell text.
-2. Fenced Code Blocks: Wrap ASCII charts strictly in triple backticks (\`\`\`). Never nest code fences inside code fences.
-3. Line Breaks & Blocks: Use \\n\\n inside JSON strings to separate paragraphs, tables, and code blocks so remark-gfm parses them as distinct blocks. Never use unescaped raw newlines.
-4. Clean Text: Keep text inside the "question" field plain (no # headings or raw HTML tags <...> that break JSX parsing).
-5. Strict JSON Escaping: All literal quotes inside JSON strings MUST be escaped as \\", and backslashes as \\\\.
 
-==================================================
-DIFFICULTY CALIBRATION (${difficulty})
-==================================================
-Apply parameters matching ${difficulty} strictly across all questions:
-
-- Easy:
-  * Length: 15–30 words (1–2 sentences).
-  * English: Direct structures, active voice, foundational accounting terminology.
-  * Task: Single-step recall, basic classification, or single-formula application.
-
-- Medium:
-  * Length: 30–60 words (2–4 sentences).
-  * English: Standard professional business English, compound sentences.
-  * Task: 2–3 step calculation or linking two concepts with one adjustment (e.g., accruals).
-
-- Hard:
-  * Length: 2–4 detailed paragraphs.
-  * English: Advanced financial vocabulary, complex syntax.
-  * Task: 5+ step calculation, synthesizing concepts, evaluating competing methods.
-
-- Extreme:
-  * Length: 6+ detailed paragraphs.
-  * English: Dense technical narrative, corporate terminology, scenario-based phrasing.
-  * Task: 10+ step case scenario, cross-syllabus integration, non-obvious methodology choice, with embedded irrelevant data.
+- Generate exactly ${numQuestions || 10} JSON objects.
+- Never generate fewer or more.
+- Return ONLY valid JSON — a single JSON array, nothing else.
+- No introductions, explanations, notes, markdown fences, or text before/after the JSON.
 
 ==================================================
-CORE CONSTRAINTS
+SOURCE MATERIAL
 ==================================================
-1. ZERO ANSWER LEAKAGE: "question" field must NEVER reveal the correct answer, show final worked steps, or label spreadsheet/chart values as solutions/results.
-2. EXPLANATION: 1–3 concise sentences explaining why the correct answer is right. No full question restatements.
-3. SILENT SELF-VALIDATION: Verify IDs are 1 to N, types match computed counts, JSON is valid, and "correct_answer" is always an array before outputting.
+
+- Use the uploaded material only as a knowledge reference.
+- Cover the syllabus for ${topic} naturally and proportionally.
+- Never copy wording from the source material.
+- Never reference page numbers or mention the uploaded files.
+
+==================================================
+CRITICAL RULE — NO ANSWER LEAKAGE
+==================================================
+
+This is a hard requirement. Violating it invalidates the question.
+
+- The "question" field must NEVER contain the correct answer, a strong hint toward it, or any wording that reveals it (e.g. do not write "...which results in a profit of $500, what is the margin?" if $500 is itself derivable only from the answer).
+- For Excel questions, the embedded spreadsheet/table/chart data must be usable to REACH the answer through calculation or interpretation — it must never already display the final answer value being asked for.
+- Do not label any value in a spreadsheet or chart as "Answer", "Correct", "Result", or similar.
+- Do not include worked solutions, calculation steps, or reasoning inside the "question" field — that belongs only in "explanation".
+- Before finalizing each question, re-read the "question" field alone (without "correct_answer") and confirm a candidate could not simply read off the answer without doing the task.
+
+==================================================
+DIFFICULTY CALIBRATION (STRICTLY ENFORCED)
+==================================================
+
+Every generated question MUST strictly follow ALL requirements of the selected difficulty.
+
+Difficulty affects FOUR independent dimensions:
+
+1. English Vocabulary
+2. Question Length
+3. Concept Integration
+4. Reasoning Complexity
+
+The AI MUST satisfy ALL four dimensions simultaneously.
+
+Never mix difficulty levels.
+
+==================================================
+ENGLISH VOCABULARY
+==================================================
+
+Vocabulary MUST become progressively more advanced.
+
+Easy
+- Use very simple English.
+- Everyday vocabulary.
+- Short sentences.
+- Avoid complex grammar.
+- Suitable for beginners.
+
+Medium
+- Use moderately advanced vocabulary.
+- Include some accounting terminology naturally.
+- Slightly longer sentences.
+- Reading difficulty should noticeably increase.
+
+Hard
+- Use professional business English.
+- Use formal accounting and financial terminology.
+- Vocabulary should be similar to IELTS Band 7.5–8.5.
+- Include more complex sentence structures.
+
+Extreme
+- Use highly professional examination-standard English.
+- Vocabulary should resemble ACCA professional papers.
+- Reading difficulty comparable to IELTS Band 8.5–9.
+- Long, information-dense sentences.
+- Candidates should need strong comprehension before solving.
+
+==================================================
+QUESTION LENGTH
+==================================================
+
+Question length MUST strictly match the selected difficulty.
+
+Easy
+- Approximately 4–5 lines.
+
+Medium
+- Approximately 5–10 lines.
+
+Hard
+- 1–2 detailed paragraphs.
+
+Extreme
+- Minimum 3 detailed paragraphs.
+- Rich business scenario.
+- Multiple stakeholders, assumptions, and business context.
+- Never generate short questions at Extreme level.
+
+==================================================
+CONCEPT INTEGRATION
+==================================================
+
+All concepts MUST belong ONLY to the selected topic.
+
+Never introduce concepts outside the requested topic.
+
+Easy
+- Test exactly ONE concept.
+
+Medium
+- Link 2–3 concepts from the SAME topic.
+
+Hard
+- Integrate 4–8 concepts from the SAME topic.
+- Include realistic adjustments where appropriate.
+- Require connecting multiple ideas before solving.
+
+Extreme
+- Integrate 10–15 concepts from the SAME topic.
+- Include several realistic adjustments.
+- Require candidates to distinguish relevant from irrelevant information.
+- Multiple calculations and interpretations may be needed.
+- Every concept MUST still belong ONLY to the selected topic.
+
+==================================================
+REASONING COMPLEXITY
+==================================================
+
+Easy
+- One-step recall OR one-step calculation.
+- Direct application.
+- No interpretation.
+
+Medium
+- Two to three reasoning steps.
+- Link two or three concepts.
+- Small adjustment may be required.
+
+Hard
+- Five or more reasoning steps.
+- Multiple linked calculations.
+- Professional judgement.
+- Several adjustments.
+- Interpretation required.
+
+Extreme
+- Ten or more reasoning steps.
+- Multiple linked calculations.
+- Numerous adjustments.
+- Professional judgement throughout.
+- Identify relevant information.
+- Ignore misleading information.
+- Choose the correct accounting treatment before solving.
+- Similar complexity to the hardest ACCA examination questions.
+
+==================================================
+STRICT VALIDATION
+==================================================
+
+Before finalising each question, silently verify:
+
+✓ English vocabulary matches the selected difficulty.
+✓ Question length matches the selected difficulty.
+✓ Number of linked concepts matches the selected difficulty.
+✓ ALL concepts belong ONLY to ${topic}.
+✓ Reasoning complexity matches the selected difficulty.
+
+If ANY requirement fails, regenerate the question internally before returning the JSON.
+
+==================================================
+QUESTION FORMATS
+==================================================
+
+**Multiple Choice Questions (MCQ)**
+- Exactly four options.
+- One or more may be correct.
+- Distractors must be realistic (common calculation errors, plausible misconceptions) — not obviously wrong.
+
+**Input Questions**
+- No answer options (empty array).
+- Candidate calculates and provides a final numeric answer.
+
+**Excel Questions**
+- Include a realistic spreadsheet as a GFM markdown table.
+- Include a text-based chart (ASCII, e.g. using '#' or '█') inside a fenced code block.
+- The chart must contain data that requires interpretation, not a direct lookup.
+- The candidate must analyse both the table and the chart to answer — never a question answerable by reading one cell directly.
+
+Only use these exact values for "type": 'MCQ', 'Input', 'Excel'. No other values.
+
+==================================================
+MARKDOWN FORMATTING RULES (react-markdown + remark-gfm COMPATIBLE)
+==================================================
+
+These rules are mandatory because output is rendered with react-markdown and remark-gfm. Non-compliant markdown will break rendering.
+ 
+1. Tables - use standard GFM pipe-table syntax with a header separator row, for example a row of column headers, then a row of dashes as the separator, then data rows. Keep to a maximum of 4 columns and 4 data rows.
+ 
+2. Charts - wrap ASCII charts in a fenced code block (three backtick characters on their own line before and after the chart) so remark-gfm renders them as a code block and does not try to parse the characters as markdown.
+ 
+3. Line breaks - inside the JSON string, use the two-character escape sequence backslash-n for every line break (never a raw unescaped newline). Use two of these in a row to separate paragraph, table, and chart blocks so remark-gfm renders them as distinct blocks.
+ 
+4. Escaping - every double-quote character and backslash character used as literal text must be properly JSON-escaped. Pipe characters used as literal text (not as a table delimiter) must not break the table structure. Do not use HTML tags. Do not nest a fenced code block inside another fenced code block.
+ 
+5. No stray markdown - do not use bold, italics, or heading markers inside "question" fields outside of the Excel chart code block; keep formatting plain except for the table and chart in Excel questions.
+
+==================================================
+EXPLANATION REQUIREMENTS
+==================================================
+
+- 1 to 3 sentences only.
+- Explain why the correct answer is correct.
+- Concise and accurate. No restating the full question.
 
 ==================================================
 OUTPUT SCHEMA
 ==================================================
+
+Return ONLY one valid JSON array, each object exactly matching:
+
 [
   {
     "id": 1,
@@ -159,6 +322,85 @@ OUTPUT SCHEMA
     "type": ""
   }
 ]
+
+Field rules:
+- "id": starts at 1, sequential, no gaps, ends at ${numQuestions || 10}.
+- "question": always present; must pass the "no answer leakage" check above.
+- "options": MCQ → exactly four items. Input → empty array. Excel → empty array unless discrete answer choices are genuinely required.
+- "correct_answer": always an array, never a string, never null.
+- "explanation": always present.
+- "type": one of 'MCQ', 'Input', 'Excel' only.
+
+==================================================
+QUESTION DISTRIBUTION — EXACT COUNTS (NOT PERCENTAGES)
+==================================================
+
+Percentages are unreliable for small batches, so compute exact integer counts before generating anything:
+
+1. Let N = ${numQuestions || 10}.
+2. mcqCount = round(N × 0.5)
+3. inputCount = round(N × 0.3)
+4. excelCount = N − mcqCount − inputCount   (this absorbs any rounding remainder — never let excelCount go negative; if it would, reduce mcqCount by 1 first)
+
+Worked example for N = 10: mcqCount = 5, inputCount = 3, excelCount = 2.
+Worked example for N = 7: mcqCount = 4 (round(3.5)), inputCount = 2 (round(2.1)), excelCount = 1.
+
+Generate EXACTLY mcqCount MCQs, EXACTLY inputCount Input questions, and EXACTLY excelCount Excel questions — total must equal N. Interleave the types throughout the array in a natural order; do not group all of one type together (e.g. avoid all MCQs first).
+
+==================================================
+SYLLABUS & CONTENT BALANCE
+==================================================
+
+Across all ${numQuestions || 10} questions, ensure a mix of:
+- Theory / conceptual questions
+- Numerical calculations
+- Realistic business scenarios
+- Spreadsheet interpretation (within Excel questions)
+- Chart interpretation (within Excel questions)
+
+Distribute across different syllabus areas of ${topic} — do not cluster all questions on one sub-topic.
+
+==================================================
+INTERNAL VALIDATION CHECKLIST (do not output this)
+==================================================
+
+Before returning the response, silently verify:
+✓ Exactly N questions generated, IDs sequential 1→N.
+✓ JSON is valid and is the ONLY output.
+✓ Every object has all five required fields.
+✓ Every MCQ has exactly four options; every Input has an empty options array.
+✓ No "question" field reveals or hints at its own "correct_answer".
+✓ Every Excel question has a GFM table AND a fenced-code-block ASCII chart requiring interpretation.
+✓ correct_answer is always an array.
+✓ No duplicate questions or near-duplicate wording.
+✓ Counts exactly match mcqCount / inputCount / excelCount computed above.
+✓ Difficulty of every question matches the ${difficulty} rubric tier.
+✓ Only type values used: MCQ, Input, Excel.
+✓ English vocabulary strictly matches ${difficulty}.
+✓ Question length strictly matches ${difficulty}.
+✓ Required number of concepts are linked according to ${difficulty}.
+✓ Every linked concept belongs ONLY to ${topic}; no out-of-topic concepts.
+
+If any check fails, regenerate internally before producing final output.
+
+==================================================
+HARD ENFORCEMENT RULE
+==================================================
+
+The four difficulty dimensions are mandatory.
+
+Do NOT simplify the language.
+Do NOT shorten the scenario.
+Do NOT reduce the number of linked concepts.
+Do NOT introduce concepts outside ${topic}.
+
+If the generated question violates ANY requirement, regenerate it internally until every requirement is satisfied.
+
+==================================================
+FINAL INSTRUCTIONS
+==================================================
+
+Do not think aloud. Do not explain your reasoning. Do not include markdown fences around the JSON array itself, headings, notes, or any text before/after the JSON. Return ONLY the JSON array.
     `.trim();
 
     // Define fallback models in priority order
