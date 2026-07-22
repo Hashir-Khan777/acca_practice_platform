@@ -177,18 +177,27 @@ Question length MUST strictly match the selected difficulty.
 
 Easy
 - Approximately 4–5 lines.
+- Single short scenario.
 
 Medium
-- Approximately 5–10 lines.
+- Approximately 10–15 lines.
+- Slightly detailed scenario.
 
 Hard
-- 1–2 detailed paragraphs.
+- MUST contain 2–4 detailed paragraphs.
+- Every paragraph should contain approximately 90–140 words.
+- Every question MUST present a highly detailed business case.
+- Include multiple people, departments, transactions or business events where appropriate.
+- Never generate short questions at Hard level.
+- Never compress information into fewer paragraphs.
 
 Extreme
-- Minimum 3 detailed paragraphs.
-- Rich business scenario.
-- Multiple stakeholders, assumptions, and business context.
+- MUST contain 5–7 detailed paragraphs.
+- Every paragraph should contain approximately 90–140 words.
+- Every question MUST present a highly detailed business case.
+- Include multiple stakeholders, departments, timelines, assumptions, financial information and business events.
 - Never generate short questions at Extreme level.
+- Never compress information into fewer paragraphs.
 
 ==================================================
 CONCEPT INTEGRATION
@@ -198,6 +207,8 @@ All concepts MUST belong ONLY to the selected topic.
 
 Never introduce concepts outside the requested topic.
 
+Never introduce prerequisite concepts that belong to another syllabus topic unless they are absolutely essential for understanding the selected topic.
+
 Easy
 - Test exactly ONE concept.
 
@@ -206,12 +217,12 @@ Medium
 
 Hard
 - Integrate 4–8 concepts from the SAME topic.
-- Include realistic adjustments where appropriate.
+- Include 1-3 realistic adjustments.
 - Require connecting multiple ideas before solving.
 
 Extreme
 - Integrate 10–15 concepts from the SAME topic.
-- Include several realistic adjustments.
+- Include 5-7 realistic adjustments.
 - Require candidates to distinguish relevant from irrelevant information.
 - Multiple calculations and interpretations may be needed.
 - Every concept MUST still belong ONLY to the selected topic.
@@ -236,6 +247,12 @@ Hard
 - Professional judgement.
 - Several adjustments.
 - Interpretation required.
+- Candidate must analyse the scenario before deciding how to solve it.
+- The correct approach should not always be immediately obvious.
+- Test conceptual understanding more than calculation speed.
+- Encourage logical reasoning and professional judgement.
+- The business scenario must appear before the actual question.
+- The final question should normally occupy only the last one or two sentences.
 
 Extreme
 - Ten or more reasoning steps.
@@ -246,6 +263,46 @@ Extreme
 - Ignore misleading information.
 - Choose the correct accounting treatment before solving.
 - Similar complexity to the hardest ACCA examination questions.
+- The candidate must first identify the underlying business issue before selecting an accounting treatment.
+- Several solution paths may appear possible, but only one should be conceptually correct.
+- Require evaluation, interpretation, elimination, and professional judgement before calculations begin.
+- Assess deep conceptual understanding rather than memorisation.
+- The answer should only be achievable through careful analysis of the entire scenario.
+- The candidate should not immediately recognise which accounting treatment applies.
+- The scenario should require interpretation before selecting the appropriate concept.
+
+==================================================
+COGNITIVE & ANALYTICAL ASSESSMENT
+==================================================
+
+The primary objective of every question is to assess the candidate's conceptual understanding, analytical thinking, professional judgement, and problem-solving ability — not simple memorisation.
+
+Every question should require the candidate to actively think before arriving at the answer.
+
+Whenever appropriate for the selected difficulty, require the candidate to:
+
+- Analyse the business scenario before identifying the relevant concept(s).
+- Interpret financial or business information rather than simply recalling facts.
+- Distinguish relevant information from irrelevant or misleading information.
+- Decide which accounting principle, method, or treatment is appropriate before performing any calculation.
+- Apply concepts to unfamiliar situations instead of repeating textbook examples.
+- Connect multiple pieces of information logically.
+- Demonstrate professional judgement where more than one approach appears possible.
+- Identify assumptions that affect the final answer.
+- Evaluate alternative treatments before selecting the most appropriate one.
+- Avoid relying solely on memorised formulas or definitions.
+- The candidate should first think "What is happening in this scenario?" before thinking "Which formula should I use?"
+- Questions should assess whether candidates can identify the correct accounting treatment or business principle before attempting any calculations.
+- Do not reward memorisation alone.
+- Reward understanding, interpretation, analysis, evaluation and judgement.
+
+Questions should test HOW the student thinks, analyses, interprets, and applies knowledge—not merely WHAT the student remembers.
+
+The candidate should need to understand the underlying concepts before solving the question.
+
+Never generate "plug-the-formula" questions where the candidate can immediately substitute values into a formula without first analysing the scenario.
+
+Questions should reward conceptual understanding, logical reasoning, and professional judgement rather than memorisation.
 
 ==================================================
 STRICT VALIDATION
@@ -380,6 +437,11 @@ Before returning the response, silently verify:
 ✓ Question length strictly matches ${difficulty}.
 ✓ Required number of concepts are linked according to ${difficulty}.
 ✓ Every linked concept belongs ONLY to ${topic}; no out-of-topic concepts.
+✓ Every question assesses conceptual understanding, not rote memorisation.
+✓ Every question requires analytical thinking appropriate to the selected difficulty.
+✓ The candidate must actively interpret or analyse information before solving.
+✓ Questions test application of concepts rather than simple recall whenever appropriate.
+✓ Business scenarios require reasoning, judgement, and decision-making instead of direct formula substitution.
 
 If any check fails, regenerate internally before producing final output.
 
