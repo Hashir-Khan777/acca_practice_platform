@@ -5,6 +5,24 @@ import { Quiz, AuditLog } from "@/lib/models";
 import { getAuthUser } from "@/lib/jwt";
 import fs from 'fs';
 import path from 'path';
+import { PDFParse } from "pdf-parse";
+
+const extractedBooks = async (matchingFiles: string[], booksDirectory: string) => {
+  const uploadedPromises = matchingFiles.map(async (fileName) => {
+    const filePath = path.join(booksDirectory, fileName);
+    const dataBuffer = await fs.promises.readFile(filePath);
+    const uint8Array = new Uint8Array(dataBuffer);
+    const pdfParser = new PDFParse(uint8Array);
+    const pdfData = await pdfParser.getText();
+    return {
+      fileName,
+      content: pdfData.text,
+    };
+  });
+
+  const uploadedBooks = await Promise.all(uploadedPromises);
+  return uploadedBooks;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +54,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `No books found matching the subject: ${subject}` }, { status: 404 });
     }
 
+    const booksdata = await extractedBooks(matchingFiles, booksDirectory);
+
+    const formattedBooksContext = booksdata
+      .map((book, index) => {
+        return `--- BOOK ${index + 1}: ${book.fileName} ---\n${book.content}\n--- END OF ${book.fileName} ---`;
+      })
+      .join('\n\n');
+
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey || apiKey === "MY_GEMINI_API_KEY") {
@@ -57,36 +83,25 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const uploadPromises = matchingFiles.map(async (fileName) => {
-      const filePath = path.join(booksDirectory, fileName);
-      
-      const uploadedFile = await ai.files.upload({
-        file: filePath,
-        config: {
-          mimeType: 'application/pdf',
-          displayName: fileName
-        }
-      });
-      return uploadedFile;
-    });
-
-    const uploadedFilesData = await Promise.all(uploadPromises);
-
-    const fileParts = uploadedFilesData.map(file => ({
-      fileData: {
-        fileUri: file.uri,
-        mimeType: file.mimeType
-      }
-    }));
-
     const prompt = `
+==================================================
+SOURCE MATERIAL
+==================================================
+
+${formattedBooksContext}
+
+- Use the given source material only as a knowledge reference.
+- Cover the syllabus for ${topic} naturally and proportionally.
+- Never copy wording from the source material.
+- Never reference page numbers or mention the given source material.
+
 ==================================================
 SYSTEM ROLE
 ==================================================
 
 You are an experienced ACCA Foundation examiner responsible for writing examination-standard practice questions.
 
-Use ONLY the uploaded ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
+Use ONLY the given ${subject} Study Text and Exam Kit as your source material. The topic must be ${topic}.
 
 Create completely original questions that assess the same learning outcomes without copying wording from the source material. Do not reproduce or paraphrase copyrighted content.
 
@@ -98,15 +113,6 @@ OBJECTIVE
 - Never generate fewer or more.
 - Return ONLY valid JSON — a single JSON array, nothing else.
 - No introductions, explanations, notes, markdown fences, or text before/after the JSON.
-
-==================================================
-SOURCE MATERIAL
-==================================================
-
-- Use the uploaded material only as a knowledge reference.
-- Cover the syllabus for ${topic} naturally and proportionally.
-- Never copy wording from the source material.
-- Never reference page numbers or mention the uploaded files.
 
 ==================================================
 CRITICAL RULE — NO ANSWER LEAKAGE
@@ -480,7 +486,6 @@ Do not think aloud. Do not explain your reasoning. Do not include markdown fence
           contents: [{
             parts: [
               { text: prompt },
-              ...fileParts
             ]
           }],
           config: {
@@ -488,7 +493,7 @@ Do not think aloud. Do not explain your reasoning. Do not include markdown fence
             systemInstruction: `You are an experienced ACCA Foundation examiner creating original, exam-standard practice questions for ${topic} in ${subject}.
             - Generate EXACTLY ${numQuestions} JSON objects in a single JSON array.
             - Output MUST be valid JSON only — no introductions, markdown code blocks around the JSON array, notes, or post-text.
-            - Do not copy wording, reference page numbers, or mention uploaded source files.`,
+            - Do not copy wording, reference page numbers, or mention given source material.`,
             responseMimeType: "application/json",
             responseSchema: {
               type: Type.ARRAY,
@@ -533,10 +538,6 @@ Do not think aloud. Do not explain your reasoning. Do not include markdown fence
           responseText = response.text;
           finalModelUsed = currentModel;
           isFallbackTriggered = i > 0; // If index > 0, fallback was used
-          const deletePromises = uploadedFilesData.map((file: any) => 
-            ai.files.delete({ name: file.name })
-          );
-          await Promise.all(deletePromises);
           break; // Exit loop successfully
         }
       } catch (modelError) {
