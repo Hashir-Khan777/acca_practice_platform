@@ -57,6 +57,8 @@ export async function POST(req: NextRequest) {
         role: 'student',
         plan: 'free',
         status: 'active',
+        country: 'Pakistan', // Default country
+        accaLevel: 'Foundation Diploma (FA1, FA2, MA1, MA2)', // Default ACCA level
         photo: picture,
         emailVerified: true // Verified by Google OAuth
       });
