@@ -186,12 +186,18 @@ export default function StudentPracticeQuizPage() {
       }
 
     } catch (err: any) {
+      try {
+        await document.exitFullscreen();
+        updateStore({ ...store, isQuizActive: false });
+      } catch (err) {
+        console.log(err, 'err')
+      }
       clearInterval(progressInterval);
       console.error(err);
       setIsGenerating(false);
       setGenProgress(0);
       setGenMessage('');
-      alert(err.message || 'AI generator failure. Please retry.');
+      alert('Quiz generator failure. Please retry.');
     }
   };
 
@@ -282,12 +288,11 @@ export default function StudentPracticeQuizPage() {
         setActiveQuiz(null);
         try {
           await document.exitFullscreen();
-          updateStore({ ...store, isQuizActive: true });
+          updateStore({ ...store, isQuizActive: false });
         } catch (err) {
           console.log(err, 'err')
         }
         localStorage.removeItem('acca_active_quiz_session');
-        updateStore({ ...store, isQuizActive: false });
         const savedAttempt = result.data.attempt;
         const updatedStreak = result.data.streak;
 
@@ -541,7 +546,7 @@ export default function StudentPracticeQuizPage() {
 
             <div className="mt-4 flex flex-col gap-3">
               <Button variant="primary" type="submit" size="lg" className="w-full shadow-lg">
-                <Sparkles className="w-5 h-5 mr-2" /> Generate Unlimited AI Quiz Now
+                <Sparkles className="w-5 h-5 mr-2" /> Generate Quiz Now
               </Button>
               <p className="text-[11px] text-center text-slate-400 font-mono">
                 Calls AI server-side. Output is automatically validated against structural schemas.
