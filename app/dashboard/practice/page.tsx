@@ -149,10 +149,17 @@ export default function StudentPracticeQuizPage() {
       setGenProgress(95);
       setGenMessage('Parsing validated question schemas...');
 
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const errText = await response.text();
+        console.error('Non-JSON response received from quiz generation endpoint:', errText);
+        throw new Error(`Server returned HTML error (${response.status}): ${errText.substring(0, 150)}`);
+      }
+
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.errors?.[0] || 'AI API generated invalid output.');
+        throw new Error(result.errors?.[0] || result.message || 'AI API generated invalid output.');
       }
 
       setGenProgress(100);

@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Subject parameter is required' }, { status: 400 });
     }
 
-    const booksDirectory = path.join(process.cwd(), 'accabooks');
+    const booksDirectory = path.join(process.cwd(), 'public', 'accabooks');
 
     if (!fs.existsSync(booksDirectory)) {
       return NextResponse.json({ error: 'accabooks folder not found on server' }, { status: 500 });
