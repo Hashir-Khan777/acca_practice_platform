@@ -7,12 +7,10 @@ import fs from 'fs';
 import path from 'path';
 import { PDFParse } from "pdf-parse";
 
-const extractedBooks = async (matchingFiles: string[], booksDirectory: string) => {
+const extractedBooks = async (matchingFiles: string[]) => {
   const uploadedPromises = matchingFiles.map(async (fileName) => {
-    const filePath = path.join(booksDirectory, fileName);
-    const dataBuffer = await fs.promises.readFile(filePath);
-    const uint8Array = new Uint8Array(dataBuffer);
-    const pdfParser = new PDFParse(uint8Array);
+    const filePath = `${process.env.NEXT_PUBLIC_APP_URL}/accabooks/${fileName}`;
+    const pdfParser = new PDFParse({ url: filePath });
     const pdfData = await pdfParser.getText();
     return {
       fileName,
@@ -54,7 +52,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `No books found matching the subject: ${subject}` }, { status: 404 });
     }
 
-    const booksdata = await extractedBooks(matchingFiles, booksDirectory);
+    const booksdata = await extractedBooks(matchingFiles);
 
     const formattedBooksContext = booksdata
       .map((book, index) => {
