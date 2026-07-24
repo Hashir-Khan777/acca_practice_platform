@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Unauthorized access', data: {}, errors: ['Invalid session'] }, { status: 401 });
     }
 
-    const { name, email, country, accaLevel } = await req.json();
+    const { name, email, country, accaLevel, photo } = await req.json();
 
     if (!name || !email) {
       return NextResponse.json({ success: false, message: 'Name and email are required fields.', data: {}, errors: ['Missing fields'] }, { status: 400 });
@@ -35,6 +35,9 @@ export async function PUT(req: NextRequest) {
     user.email = emailLower;
     user.country = country || '';
     user.accaLevel = accaLevel || '';
+    if (photo) {
+      user.photo = photo;
+    }
     await user.save();
 
     // Create Audit Log
