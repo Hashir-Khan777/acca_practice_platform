@@ -7,26 +7,43 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json().catch(() => ({}));
-    const { credential } = body;
+    const { credential, accessToken: clientAccessToken } = body;
 
-    if (!credential) {
-      return NextResponse.json({ success: false, message: 'Google credential token is required.', data: {}, errors: ['Missing credential'] }, { status: 400 });
+    let email = '';
+    let name = '';
+    let picture = '';
+
+    if (clientAccessToken) {
+      // Validate OAuth Access Token via Google userinfo endpoint
+      const verifyRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${clientAccessToken}` }
+      });
+      if (!verifyRes.ok) {
+        return NextResponse.json({ success: false, message: 'Google access token verification failed.', data: {}, errors: ['Invalid access token'] }, { status: 400 });
+      }
+      const verifyData = await verifyRes.json();
+      if (!verifyData.email) {
+        return NextResponse.json({ success: false, message: 'Invalid user info payload returned from Google.', data: {}, errors: ['Invalid payload'] }, { status: 400 });
+      }
+      email = verifyData.email.toLowerCase().trim();
+      name = verifyData.name || 'Google User';
+      picture = verifyData.picture || 'https://picsum.photos/seed/google/200/200';
+    } else if (credential) {
+      // Validate ID Token via Google tokeninfo endpoint
+      const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+      if (!verifyRes.ok) {
+        return NextResponse.json({ success: false, message: 'Google identity token verification failed.', data: {}, errors: ['Invalid token'] }, { status: 400 });
+      }
+      const verifyData = await verifyRes.json();
+      if (!verifyData.email) {
+        return NextResponse.json({ success: false, message: 'Invalid payload returned from Google authentication.', data: {}, errors: ['Invalid payload'] }, { status: 400 });
+      }
+      email = verifyData.email.toLowerCase().trim();
+      name = verifyData.name || 'Google User';
+      picture = verifyData.picture || 'https://picsum.photos/seed/google/200/200';
+    } else {
+      return NextResponse.json({ success: false, message: 'Google authentication credentials are required.', data: {}, errors: ['Missing token'] }, { status: 400 });
     }
-
-    // Verify Google ID token using Google Identity tokeninfo endpoint
-    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-    if (!verifyRes.ok) {
-      return NextResponse.json({ success: false, message: 'Google identity token verification failed.', data: {}, errors: ['Invalid token'] }, { status: 400 });
-    }
-
-    const verifyData = await verifyRes.json();
-    if (!verifyData.email) {
-      return NextResponse.json({ success: false, message: 'Invalid payload returned from Google authentication.', data: {}, errors: ['Invalid payload'] }, { status: 400 });
-    }
-
-    const email = verifyData.email.toLowerCase().trim();
-    const name = verifyData.name || 'Google User';
-    const picture = verifyData.picture || 'https://picsum.photos/seed/google/200/200';
 
     let user = await User.findOne({ email });
 
