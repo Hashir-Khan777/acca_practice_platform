@@ -5,13 +5,16 @@ import { Quiz, AuditLog } from "@/lib/models";
 import { getAuthUser } from "@/lib/jwt";
 import fs from 'fs';
 import path from 'path';
-import { PDFParse } from "pdf-parse";
+import { extractText, getDocumentProxy } from 'unpdf'
 
-const extractedBooks = async (matchingFiles: string[]) => {
+const extractedBooks = async (matchingFiles: string[], booksDirectory: string) => {
   const uploadedPromises = matchingFiles.map(async (fileName) => {
-    const filePath = `${process.env.NEXT_PUBLIC_APP_URL}/accabooks/${fileName}`;
-    const pdfParser = new PDFParse({ url: filePath });
-    const pdfData = await pdfParser.getText();
+    const filePath = path.join(booksDirectory, fileName);
+    const dataBuffer = await fs.promises.readFile(filePath);
+    const uint8Array = new Uint8Array(dataBuffer);
+    const pdf = await getDocumentProxy(uint8Array);
+    const pdfData = await extractText(pdf, { mergePages: true });
+
     return {
       fileName,
       content: pdfData.text,
@@ -52,7 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `No books found matching the subject: ${subject}` }, { status: 404 });
     }
 
-    const booksdata = await extractedBooks(matchingFiles);
+    const booksdata = await extractedBooks(matchingFiles, booksDirectory);
 
     const formattedBooksContext = booksdata
       .map((book, index) => {
