@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import { User, DailyStreak, AuditLog } from '@/lib/models';
 import { signAccessToken, signRefreshToken } from '@/lib/jwt';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,6 +29,9 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
     // Create the new User
     const newUser = new User({
       name,
@@ -37,10 +41,20 @@ export async function POST(req: NextRequest) {
       plan: 'free',
       status: 'active',
       country: country || '',
-      accaLevel: accaLevel || ''
+      accaLevel: accaLevel || '',
+      emailVerified: false,
+      verificationCode,
+      verificationExpires
     });
 
     await newUser.save();
+
+    // Send verification email
+    await sendEmail({
+      to: emailLower,
+      subject: 'Verify your Accountly Email',
+      body: `Hi ${name},\n\nWelcome to Accountly! Your 6-digit verification code is: ${verificationCode}\n\nThis code will expire in 1 hour.`
+    });
 
     // Initialize the DailyStreak schema for this student
     const newStreak = new DailyStreak({
@@ -82,7 +96,8 @@ export async function POST(req: NextRequest) {
           accaLevel: newUser.accaLevel,
           photo: newUser.photo,
           createdAt: newUser.createdAt,
-          totalQuizzes: newUser.totalQuizzes
+          totalQuizzes: newUser.totalQuizzes,
+          emailVerified: newUser.emailVerified === true
         }
       },
       errors: []

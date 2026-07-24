@@ -1,14 +1,3 @@
-// --- DOM Matrix Polyfill for PDF.js (Production Server) ---
-if (typeof global.DOMMatrix === 'undefined') {
-  class DOMMatrixPolyfill {
-    a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;
-    constructor() {}
-  }
-  // @ts-ignore
-  global.DOMMatrix = DOMMatrixPolyfill;
-}
-// -----------------------------------------------------------
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";

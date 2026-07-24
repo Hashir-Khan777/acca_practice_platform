@@ -4,7 +4,6 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import { Button, Card, Input, Select, Badge } from '@/components/UI';
-import { loadStore, saveStore, User } from '@/lib/store';
 import { UserPlus, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -22,6 +21,54 @@ export default function RegisterPage() {
     { value: 'Strategic Professional (SBL, SBR)', label: 'Strategic Professional (SBL, SBR)' },
     { value: 'Strategic Professional Options (AFM, APM, ATX AAA)', label: 'Strategic Professional Options (AFM, APM, ATX AAA)' },
   ];
+
+  const handleGoogleLoginCallback = async (response: any) => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setIsSubmitting(false);
+        router.push('/dashboard');
+      } else {
+        setError(result.message || 'Google Authentication failed.');
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setError('Connection failed. Database or Google Authentication route is offline.');
+      setIsSubmitting(false);
+    }
+  };
+
+  React.useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1234567890-abcdef.apps.googleusercontent.com';
+      if ((window as any).google) {
+        (window as any).google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleLoginCallback
+        });
+        (window as any).google.accounts.id.renderButton(
+          document.getElementById('googleBtn'),
+          { theme: 'outline', size: 'large', width: 380 }
+        );
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,58 +149,71 @@ export default function RegisterPage() {
                   {setTimeout(() => router.push('/dashboard'), 1500) && null}
                 </motion.div>
               ) : (
-                <form onSubmit={handleRegister} className="flex flex-col gap-4">
-                  <Input
-                    label="Full Name"
-                    placeholder="e.g. Jhon Doe"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    required
-                  />
-
-                  <Input
-                    label="Active Email Address"
-                    type="email"
-                    placeholder="e.g. example@gmail.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    required
-                  />
-
-                  <Input
-                    label="Country of Residence"
-                    placeholder="e.g. United Kingdom"
-                    value={form.country}
-                    onChange={(e) => setForm({ ...form, country: e.target.value })}
-                  />
-
-                  <Select
-                    label="Study Level"
-                    options={accaLevels}
-                    value={form.accaLevel}
-                    onChange={(e) => setForm({ ...form, accaLevel: e.target.value })}
-                  />
-
-                  <Input
-                    label="Choose Password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    required
-                  />
-
-                  <div className="flex items-center gap-2 mt-1">
-                    <input type="checkbox" id="accept_terms" required className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 w-4 h-4" />
-                    <label htmlFor="accept_terms" className="text-[11px] text-slate-400">
-                      I agree to the platform&apos;s <span onClick={() => router.push('/terms')} className="text-emerald-500 cursor-pointer hover:underline">Terms</span> & <span onClick={() => router.push('/privacy')} className="text-emerald-500 cursor-pointer hover:underline">Privacy Policies</span>.
-                    </label>
+                <div className="flex flex-col gap-4">
+                  {/* Google OAuth Register Buttons */}
+                  <div className="flex flex-col gap-3">
+                    <div id="googleBtn" className="w-full flex justify-center"></div>
                   </div>
 
-                  <Button variant="primary" type="submit" isLoading={isSubmitting} className="w-full mt-2">
-                    Register Profile <UserPlus className="w-4 h-4 ml-2" />
-                  </Button>
-                </form>
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t border-slate-150 dark:border-slate-850"></div>
+                    <span className="flex-shrink mx-4 text-slate-400 text-[10px] uppercase font-mono tracking-widest">Or sign up with email</span>
+                    <div className="flex-grow border-t border-slate-150 dark:border-slate-850"></div>
+                  </div>
+
+                  <form onSubmit={handleRegister} className="flex flex-col gap-4">
+                    <Input
+                      label="Full Name"
+                      placeholder="e.g. Jhon Doe"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      required
+                    />
+
+                    <Input
+                      label="Active Email Address"
+                      type="email"
+                      placeholder="e.g. example@gmail.com"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      required
+                    />
+
+                    <Input
+                      label="Country of Residence"
+                      placeholder="e.g. United Kingdom"
+                      value={form.country}
+                      onChange={(e) => setForm({ ...form, country: e.target.value })}
+                    />
+
+                    <Select
+                      label="Study Level"
+                      options={accaLevels}
+                      value={form.accaLevel}
+                      onChange={(e) => setForm({ ...form, accaLevel: e.target.value })}
+                    />
+
+                    <Input
+                      label="Choose Password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      required
+                    />
+
+                    <div className="flex items-center gap-2 mt-1">
+                      <input type="checkbox" id="accept_terms" required className="rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 w-4 h-4" />
+                      <label htmlFor="accept_terms" className="text-[11px] text-slate-400">
+                        I agree to the platform&apos;s <span onClick={() => router.push('/terms')} className="text-emerald-500 cursor-pointer hover:underline">Terms</span> & <span onClick={() => router.push('/privacy')} className="text-emerald-500 cursor-pointer hover:underline">Privacy Policies</span>.
+                      </label>
+                    </div>
+
+                    <Button variant="primary" type="submit" isLoading={isSubmitting} className="w-full mt-2">
+                      Register Profile <UserPlus className="w-4 h-4 ml-2" />
+                    </Button>
+                  </form>
+                </div>
               )}
 
               <hr className="border-slate-50 dark:border-slate-900" />

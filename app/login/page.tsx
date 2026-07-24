@@ -4,9 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import PageWrapper from '@/components/PageWrapper';
 import { Button, Card, Input, Badge } from '@/components/UI';
-import { loadStore, saveStore } from '@/lib/store';
-import { LogIn, Key, Mail, Shield, User as UserIcon } from 'lucide-react';
-import { motion } from 'motion/react';
+import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +12,54 @@ export default function LoginPage() {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleGoogleLoginCallback = async (response: any) => {
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        setIsSubmitting(false);
+        router.push('/dashboard');
+      } else {
+        setError(result.message || 'Google Authentication failed.');
+        setIsSubmitting(false);
+      }
+    } catch (err: any) {
+      setError('Connection failed. Database or Google Authentication route is offline.');
+      setIsSubmitting(false);
+    }
+  };
+
+  React.useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '1234567890-abcdef.apps.googleusercontent.com';
+      if ((window as any).google) {
+        (window as any).google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleLoginCallback
+        });
+        (window as any).google.accounts.id.renderButton(
+          document.getElementById('googleBtn'),
+          { theme: 'outline', size: 'large', width: 380 }
+        );
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +124,18 @@ export default function LoginPage() {
               )}
 
               <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                
+                {/* Google Sign-in Buttons */}
+                <div className="flex flex-col gap-3">
+                  <div id="googleBtn" className="w-full flex justify-center"></div>
+                </div>
+
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-slate-150 dark:border-slate-850"></div>
+                  <span className="flex-shrink mx-4 text-slate-400 text-[10px] uppercase font-mono tracking-widest">Or email login</span>
+                  <div className="flex-grow border-t border-slate-150 dark:border-slate-850"></div>
+                </div>
+
                 <Input
                   label="Email Address"
                   type="email"
@@ -97,7 +155,10 @@ export default function LoginPage() {
                 />
 
                 <div className="flex items-center justify-between text-xs font-mono mt-1">
-                  <span className="text-slate-400 hover:text-emerald-500 transition-colors cursor-pointer">
+                  <span
+                    onClick={() => router.push('/forgot-password')}
+                    className="text-slate-405 hover:text-emerald-505 transition-colors cursor-pointer"
+                  >
                     Forgot Password?
                   </span>
                   <span

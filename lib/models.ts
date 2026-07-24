@@ -17,6 +17,11 @@ export interface IUser extends Document {
   createdAt: Date;
   lastLogin?: Date;
   totalQuizzes: number;
+  emailVerified: boolean;
+  verificationCode?: string;
+  verificationExpires?: Date;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   comparePassword: (password: string) => Promise<boolean>;
 }
 
@@ -32,7 +37,12 @@ const UserSchema = new Schema<IUser>({
   photo: { type: String, default: 'https://picsum.photos/seed/student/200/200' },
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date },
-  totalQuizzes: { type: Number, default: 0 }
+  totalQuizzes: { type: Number, default: 0 },
+  emailVerified: { type: Boolean, default: false },
+  verificationCode: { type: String },
+  verificationExpires: { type: Date },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
 });
 
 UserSchema.pre('save', async function () {
@@ -311,3 +321,23 @@ const SubscriberSchema = new Schema<ISubscriber>({
 });
 
 export const Subscriber = mongoose.models.Subscriber || mongoose.model<ISubscriber>('Subscriber', SubscriberSchema);
+
+// ==========================================
+// 13. SENT EMAIL MODEL (FOR LOGGING EMAILS)
+// ==========================================
+export interface ISentEmail extends mongoose.Document {
+  to: string;
+  subject: string;
+  body: string;
+  sentAt: Date;
+}
+
+const SentEmailSchema = new mongoose.Schema<ISentEmail>({
+  to: { type: String, required: true },
+  subject: { type: String, required: true },
+  body: { type: String, required: true },
+  sentAt: { type: Date, default: Date.now }
+});
+
+export const SentEmail = mongoose.models.SentEmail || mongoose.model<ISentEmail>('SentEmail', SentEmailSchema);
+

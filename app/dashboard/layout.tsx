@@ -41,6 +41,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }
 
         const currentUser = userJson.data.user;
+        if (!currentUser.emailVerified) {
+          router.push('/verify-email');
+          return;
+        }
         const initialTheme = typeof window !== 'undefined' ? (localStorage.getItem('acca_theme') || 'light') : 'light';
 
         // 2. Fetch student attempts

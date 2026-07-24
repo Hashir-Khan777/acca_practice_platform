@@ -84,7 +84,8 @@ export async function POST(req: NextRequest) {
           accaLevel: user.accaLevel,
           photo: user.photo,
           createdAt: user.createdAt,
-          totalQuizzes: user.totalQuizzes
+          totalQuizzes: user.totalQuizzes,
+          emailVerified: user.emailVerified
         }
       },
       errors: []
